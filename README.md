@@ -1,0 +1,1 @@
+# remora-discord-bot-template
