@@ -1,23 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>RemoraDiscordBot.Core</RootNamespace>
-      <UserSecretsId>e10541ca-9593-4c6c-9569-5cda8eb29472</UserSecretsId>
-  </PropertyGroup>
+    </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Remora.Discord" Version="2022.52.0" />
       <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.435">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\RemoraDiscordBot.Business\RemoraDiscordBot.Business.csproj" />
     </ItemGroup>
 
 </Project>

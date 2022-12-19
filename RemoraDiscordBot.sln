@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoraDiscordBot.Data", "Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoraDiscordBot.Data.Domain", "RemoraDiscordBot.Data.Domain\RemoraDiscordBot.Data.Domain.csproj", "{A64C19A6-13C3-459F-B75E-AF291FF0A215}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoraDiscordBot.Business", "RemoraDiscordBot.Business\RemoraDiscordBot.Business.csproj", "{7B728E7A-1502-480F-981A-8A52740968E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{A64C19A6-13C3-459F-B75E-AF291FF0A215}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A64C19A6-13C3-459F-B75E-AF291FF0A215}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A64C19A6-13C3-459F-B75E-AF291FF0A215}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B728E7A-1502-480F-981A-8A52740968E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B728E7A-1502-480F-981A-8A52740968E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B728E7A-1502-480F-981A-8A52740968E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B728E7A-1502-480F-981A-8A52740968E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
