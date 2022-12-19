@@ -12,6 +12,13 @@ var host = Host.CreateDefaultBuilder(args)
             .AddHostedService<Worker>()
             .AddDiscordBot(hostContext.Configuration);
     })
+    .ConfigureLogging
+    (
+        c => c
+            .AddConsole()
+            .AddFilter("System.Net.Http.HttpClient.*.LogicalHandler", LogLevel.Warning)
+            .AddFilter("System.Net.Http.HttpClient.*.ClientHandler", LogLevel.Warning)
+    )
     .Build();
 
 await host.RunAsync();
