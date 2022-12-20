@@ -8,6 +8,7 @@ using Remora.Discord.Commands.Extensions;
 using Remora.Discord.Gateway.Extensions;
 using RemoraDiscordBot.Core.Commands;
 using RemoraDiscordBot.Core.Exceptions;
+using RemoraDiscordBot.Core.Responders.AnyResponderLogging;
 
 namespace RemoraDiscordBot.Core;
 
@@ -23,6 +24,7 @@ public static class Setup
         return serviceCollection
             .AddDiscordGateway(_ => botToken)
             .AddDiscordCommands(true)
-            .AddDiscordBotCommands();
+            .AddDiscordBotCommands()
+            .AddAnyEventResponderLogging();
     }
 }
