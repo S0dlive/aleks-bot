@@ -3,17 +3,17 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.EntityFrameworkCore;
+using RemoraDiscordBot.Data.Domain.Xp;
 
 namespace RemoraDiscordBot.Data;
 
 public class RemoraDiscordBotDbContext
     : DbContext
 {
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public RemoraDiscordBotDbContext(DbContextOptions options)
+        : base(options)
     {
-        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings:DefaultConnection")
-                               ?? throw new InvalidOperationException("Connection string not found.");
-
-        optionsBuilder.UseSqlite(connectionString);
     }
+
+    public DbSet<UserGuildXp> UserGuildXps { get; set; } = null!;
 }
