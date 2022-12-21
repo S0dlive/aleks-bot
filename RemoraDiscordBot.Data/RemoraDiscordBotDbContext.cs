@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RemoraDiscordBot.Data.Domain.Xp;
 
 namespace RemoraDiscordBot.Data;
@@ -10,9 +11,18 @@ namespace RemoraDiscordBot.Data;
 public class RemoraDiscordBotDbContext
     : DbContext
 {
-    public RemoraDiscordBotDbContext(DbContextOptions options)
+    private readonly ILogger<RemoraDiscordBotDbContext> _logger;
+    
+    private readonly ILoggerFactory _loggerFactory;
+
+    public RemoraDiscordBotDbContext(
+        DbContextOptions options,
+        ILogger<RemoraDiscordBotDbContext> logger, 
+        ILoggerFactory loggerFactory)
         : base(options)
     {
+        _logger = logger;
+        _loggerFactory = new LoggerFactory();
     }
 
     public DbSet<UserGuildXp> UserGuildXps { get; set; } = null!;

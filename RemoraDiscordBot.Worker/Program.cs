@@ -2,6 +2,7 @@
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RemoraDiscordBot.Core;
 using RemoraDiscordBot.Data;
@@ -12,11 +13,15 @@ var host = Host.CreateDefaultBuilder(args)
     {
         services
             .AddHostedService<Worker>()
-            .AddDiscordBot(hostContext.Configuration)
             .AddDbContext<RemoraDiscordBotDbContext>(options =>
-                options.UseMySql(
+                options
+                    .UseMySql(
                     hostContext.Configuration["ConnectionStrings:DefaultConnection"],
-                    ServerVersion.AutoDetect(hostContext.Configuration["ConnectionStrings:DefaultConnection"])));
+                    ServerVersion.AutoDetect(hostContext.Configuration["ConnectionStrings:DefaultConnection"]))
+                    .LogTo(Console.WriteLine, LogLevel.Information))
+                    .AddDiscordBot(hostContext.Configuration)
+            .AddMediatR(typeof(Setup).Assembly)
+            ;
     })
     .ConfigureLogging
     (

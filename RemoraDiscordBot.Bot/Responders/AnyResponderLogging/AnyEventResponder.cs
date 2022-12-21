@@ -9,7 +9,7 @@ using Remora.Results;
 
 namespace RemoraDiscordBot.Core.Responders.AnyResponderLogging;
 
-public class AnyEventResponder
+public sealed class AnyEventResponder
     : IResponder<IGatewayEvent>
 {
     private readonly ILogger<AnyEventResponder> _logger;
@@ -21,8 +21,8 @@ public class AnyEventResponder
 
     public Task<Result> RespondAsync(IGatewayEvent gatewayEvent, CancellationToken ct = new())
     {
-        _logger.LogDebug("Received event {EventName}", gatewayEvent.GetType().Name);
-        
+        _logger.LogInformation("Received event {EventName}", gatewayEvent.GetType().Name);
+
         return Task.FromResult(Result.FromSuccess());
     }
 }
