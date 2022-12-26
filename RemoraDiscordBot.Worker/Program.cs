@@ -5,8 +5,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RemoraDiscordBot.Core;
+using RemoraDiscordBot.Core.Commands;
 using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Worker;
+using Setup = RemoraDiscordBot.Plugins.Experience.Setup;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -16,11 +18,11 @@ var host = Host.CreateDefaultBuilder(args)
             .AddDbContext<RemoraDiscordBotDbContext>(options =>
                 options
                     .UseMySql(
-                    hostContext.Configuration["ConnectionStrings:DefaultConnection"],
-                    ServerVersion.AutoDetect(hostContext.Configuration["ConnectionStrings:DefaultConnection"]))
+                        hostContext.Configuration["ConnectionStrings:DefaultConnection"],
+                        ServerVersion.AutoDetect(hostContext.Configuration["ConnectionStrings:DefaultConnection"]))
                     .LogTo(Console.WriteLine, LogLevel.Information))
-                    .AddDiscordBot(hostContext.Configuration)
-            .AddMediatR(typeof(Setup).Assembly)
+            .AddDiscordBot(hostContext.Configuration)
+            .AddMediatR(AppDomain.CurrentDomain.GetAssemblies())
             ;
     })
     .ConfigureLogging
