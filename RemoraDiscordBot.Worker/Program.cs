@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using RemoraDiscordBot.Core;
 using RemoraDiscordBot.Core.Commands;
 using RemoraDiscordBot.Data;
+using RemoraDiscordBot.Plugins.Experience;
 using RemoraDiscordBot.Worker;
 using Setup = RemoraDiscordBot.Plugins.Experience.Setup;
 
@@ -23,6 +24,8 @@ var host = Host.CreateDefaultBuilder(args)
                     .LogTo(Console.WriteLine, LogLevel.Information))
             .AddDiscordBot(hostContext.Configuration)
             .AddMediatR(AppDomain.CurrentDomain.GetAssemblies())
+            
+            .AddExperiencePlugin()
             ;
     })
     .ConfigureLogging

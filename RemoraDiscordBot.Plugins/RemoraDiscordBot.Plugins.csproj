@@ -22,7 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Experience\Commands" />
         <Folder Include="Experience\Responders" />
     </ItemGroup>
 

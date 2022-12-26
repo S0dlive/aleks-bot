@@ -3,6 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Extensions.DependencyInjection;
+using Remora.Commands.Extensions;
+using RemoraDiscordBot.Plugins.Experience.CommandGroups;
 
 namespace RemoraDiscordBot.Plugins.Experience;
 
@@ -12,6 +14,9 @@ public static class Setup
         this IServiceCollection services)
     {
         return services
+                .AddCommandTree()
+                .WithCommandGroup<ExperienceCommandGroup>()
+                .Finish()
             ;
     }
 }
