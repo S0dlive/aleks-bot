@@ -30,7 +30,7 @@ public class GetExperienceAmountByUserHandler
     {
         _logger.LogDebug("Getting experience amount for user {UserId}", request.UserId);
 
-        var user = await _context.UserGuildXps.SingleOrDefaultAsync(
+        var user = await _context.UserGuildXps.FirstOrDefaultAsync(
             x => x.UserId == request.UserId.ToLong() && x.GuildId == request.GuildId.ToLong(), cancellationToken);
 
         _logger.LogInformation(user is null
