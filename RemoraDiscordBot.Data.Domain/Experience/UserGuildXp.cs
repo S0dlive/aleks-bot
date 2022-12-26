@@ -8,7 +8,7 @@ namespace RemoraDiscordBot.Data.Domain.Xp;
 
 public class UserGuildXp
 {
-    public UserGuildXp(ulong userId, ulong guildId)
+    public UserGuildXp(long userId, long guildId)
     {
         UserId = userId;
         GuildId = guildId;
@@ -17,13 +17,13 @@ public class UserGuildXp
         XpNeededToLevelUp = 0;
     }
 
-    [Key] public ulong UserId { get; set; }
+    [Key] public long UserId { get; set; }
 
-    public ulong GuildId { get; set; }
+    public long GuildId { get; set; }
 
-    public ulong XpAmount { get; set; }
+    public long XpAmount { get; set; }
 
-    public ulong Level { get; set; }
+    public long Level { get; set; }
 
-    public ulong XpNeededToLevelUp { get; set; }
+    public long XpNeededToLevelUp { get; set; }
 }

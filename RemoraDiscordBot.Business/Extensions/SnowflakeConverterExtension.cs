@@ -12,4 +12,9 @@ public static class SnowflakeConverterExtension
     {
         return new Snowflake(value);
     }
+
+    public static long ToLong(this Snowflake value)
+    {
+        return long.TryParse(value.ToString(), out var result) ? result : 0;
+    }
 }

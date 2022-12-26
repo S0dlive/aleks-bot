@@ -8,5 +8,5 @@ using Remora.Rest.Core;
 
 namespace RemoraDiscordBot.Plugins.Experience.Queries;
 
-public sealed record GetExperienceAmountByUserQuery(OneOf<Snowflake, ulong> UserId, OneOf<Snowflake, ulong> GuildId)
-    : IRequest<ulong>;
+public sealed record GetExperienceAmountByUserQuery(Snowflake UserId, Snowflake GuildId)
+    : IRequest<long>;
