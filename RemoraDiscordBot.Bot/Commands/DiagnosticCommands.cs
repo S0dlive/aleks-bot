@@ -8,12 +8,14 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Remora.Commands.Attributes;
 using Remora.Commands.Groups;
+using Remora.Discord.API.Abstractions.Objects;
+using Remora.Discord.API.Abstractions.Rest;
 using Remora.Discord.API.Objects;
 using Remora.Discord.Commands.Contexts;
 using Remora.Discord.Commands.Extensions;
 using Remora.Discord.Commands.Feedback.Services;
 using Remora.Results;
-using RemoraDiscordBot.Data;
+using RemoraDiscordBot.Business.Colors;
 using RemoraDiscordBot.Plugins.Experience.Queries;
 
 namespace RemoraDiscordBot.Core.Commands;
@@ -23,20 +25,20 @@ public sealed class DiagnosticCommands
 {
     private readonly ICommandContext _commandContext;
     private readonly FeedbackService _feedbackService;
-    private readonly ILogger<DiagnosticCommands> _logger;
     private readonly IMediator _mediator;
+    private readonly IDiscordRestUserAPI _userApi;
 
     public DiagnosticCommands(
         FeedbackService feedbackService,
         ICommandContext commandContext,
         IMediator mediator,
-        ILogger<DiagnosticCommands> logger)
+        ILogger<DiagnosticCommands> logger,
+        IDiscordRestUserAPI userApi)
     {
         _feedbackService = feedbackService;
         _commandContext = commandContext;
         _mediator = mediator;
-        _logger = logger;
-        _dbContext = dbContext;
+        _userApi = userApi;
     }
 
     [Command("hello")]
@@ -56,27 +58,40 @@ public sealed class DiagnosticCommands
     }
 
     [Command("xp")]
-    [Description("Gets the amount of XP you have.")]
-    public async Task<IResult> XpCommandAsync()
+    [Description("Gets the amount of XP you have or the passed user has.")]
+    public async Task<IResult> XpCommandAsync(
+        [Description("Argument user to get the experience amount from")]
+        IUser? user = null)
     {
-        if (!_commandContext.TryGetGuildID(out var guildId))
-            throw new InvalidOperationException("This command can only be used in a guild.");
+        if (!_commandContext.TryGetUserID(out var instigatorId))
+            throw new InvalidOperationException("Could not get the user ID.");
 
-        if (!_commandContext.TryGetUserID(out var userId))
-            throw new InvalidOperationException("This command can only be used by a user.");
+        if (!_commandContext.TryGetGuildID(out var instigatorGuildId))
+            throw new InvalidOperationException("Could not get the guild ID.");
 
-        _logger.LogInformation("Getting XP for user {UserId} in guild {GuildId}", userId, guildId);
+        if (user is {IsBot.Value: true})
+            return (Result) await _feedbackService.SendContextualEmbedAsync(
+                new Embed
+                {
+                    Title = "Error",
+                    Description = "You cannot get the XP of a bot.",
+                    Colour = Color.Red
+                },
+                ct: CancellationToken);
 
+        var userToCheck = user?.ID ?? instigatorId;
         var xp = await _mediator.Send(
-            new GetExperienceAmountByUserQuery(userId.Value, guildId.Value));
+            new GetExperienceAmountByUserQuery(userToCheck.Value, instigatorGuildId.Value),
+            CancellationToken);
 
+        var instigatorUser = await _userApi.GetUserAsync(instigatorId.Value, CancellationToken);
 
         return (Result) await _feedbackService.SendContextualEmbedAsync(
             new Embed
             {
-                Title = "Hello!",
-                Description = $"Vous avez {xp} XP",
-                Colour = Color.Green
+                Title = $"Experience for {user?.Username ?? instigatorUser.Entity.Username}",
+                Description = $"**{xp}** XP",
+                Colour = DiscordTransparentColor.Value
             },
             ct: CancellationToken);
     }
