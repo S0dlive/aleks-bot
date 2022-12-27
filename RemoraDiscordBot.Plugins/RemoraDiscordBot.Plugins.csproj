@@ -21,8 +21,4 @@
         <ProjectReference Include="..\RemoraDiscordBot.Data\RemoraDiscordBot.Data.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Experience\Responders" />
-    </ItemGroup>
-
 </Project>

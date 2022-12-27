@@ -57,15 +57,7 @@ public class ExperienceCommandGroup
         if (!_commandContext.TryGetGuildID(out var instigatorGuildId))
             throw new InvalidOperationException("Could not get the guild ID.");
 
-        if (user?.IsBot is {HasValue: true, Value: true})
-            return (Result) await _feedbackService.SendContextualEmbedAsync(
-                new Embed
-                {
-                    Title = "Error",
-                    Description = "You cannot get the XP of a bot.",
-                    Colour = Color.Red
-                },
-                ct: CancellationToken);
+        
 
         var userToCheck = user?.ID ?? instigatorId;
         var xp = await _mediator.Send(

@@ -4,7 +4,9 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Remora.Commands.Extensions;
+using Remora.Discord.Gateway.Extensions;
 using RemoraDiscordBot.Plugins.Experience.CommandGroups;
+using RemoraDiscordBot.Plugins.Experience.Responders;
 
 namespace RemoraDiscordBot.Plugins.Experience;
 
@@ -17,6 +19,8 @@ public static class Setup
                 .AddCommandTree()
                 .WithCommandGroup<ExperienceCommandGroup>()
                 .Finish()
+            
+                .AddResponder<MessageCreateGrantExperienceResponder>()
             ;
     }
 }
