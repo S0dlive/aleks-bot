@@ -4,7 +4,9 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Remora.Discord.API.Abstractions.Gateway.Commands;
 using Remora.Discord.Commands.Extensions;
+using Remora.Discord.Gateway;
 using Remora.Discord.Gateway.Extensions;
 using RemoraDiscordBot.Core.Commands;
 using RemoraDiscordBot.Core.Exceptions;
@@ -25,6 +27,17 @@ public static class Setup
 
         return serviceCollection
                 .AddDiscordGateway(_ => botToken)
+                .Configure<DiscordGatewayClientOptions>(options =>
+                {
+                    options.Intents = GatewayIntents.MessageContents
+                                                   | GatewayIntents.GuildMessages
+                                                   | GatewayIntents.Guilds
+                                                   | GatewayIntents.GuildMembers
+                                                   | GatewayIntents.GuildMessageReactions
+                                                   | GatewayIntents.GuildMessageTyping
+                                                   | GatewayIntents.Guilds
+                                                   | GatewayIntents.GuildVoiceStates;
+                })
                 .AddDiscordCommands(true)
                 .AddDiscordBotCommands()
                 .AddExperiencePlugin()

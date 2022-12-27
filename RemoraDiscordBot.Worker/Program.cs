@@ -4,6 +4,8 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Remora.Discord.API.Abstractions.Gateway.Commands;
+using Remora.Discord.Gateway;
 using RemoraDiscordBot.Core;
 using RemoraDiscordBot.Core.Commands;
 using RemoraDiscordBot.Data;
