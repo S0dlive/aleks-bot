@@ -2,8 +2,8 @@
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Immutable;
 using MediatR;
-using Microsoft.Extensions.Logging;
 using Remora.Discord.API.Abstractions.Gateway.Events;
 using Remora.Discord.Gateway.Responders;
 using Remora.Results;
@@ -14,26 +14,25 @@ namespace RemoraDiscordBot.Plugins.Experience.Responders;
 public class MessageCreateGrantExperienceResponder
     : IResponder<IMessageCreate>
 {
-    private readonly ILogger<MessageCreateGrantExperienceResponder> _logger;
     private readonly IMediator _mediator;
 
     public MessageCreateGrantExperienceResponder(
-        ILogger<MessageCreateGrantExperienceResponder> logger,
         IMediator mediator)
     {
-        _logger = logger;
         _mediator = mediator;
     }
 
     public async Task<Result> RespondAsync(IMessageCreate gatewayEvent, CancellationToken ct = new())
     {
+        if (gatewayEvent.Author.IsBot is {HasValue: true, Value: true}) return Result.FromSuccess();
+
         var instigator = gatewayEvent.Author;
         var messageLength = gatewayEvent.Content.Length;
+        var words = gatewayEvent.Content.Split(' ').Distinct().ToImmutableArray();
+        var xpEarned = (int)(Math.Pow(words.Length + messageLength, 2) / 1000);
 
-        _logger.LogInformation("Message from {User} with {MessageLength} characters", instigator, messageLength);
-       
-        await _mediator.Send(new GrantExperienceAmountToUserCommand(instigator.ID, messageLength + 1 * 2), ct);
-    
+        await _mediator.Send(new GrantExperienceAmountToUserCommand(instigator.ID, xpEarned), ct);
+
         return Result.FromSuccess();
     }
 }
