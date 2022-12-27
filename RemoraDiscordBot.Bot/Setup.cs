@@ -8,6 +8,7 @@ using Remora.Discord.Commands.Extensions;
 using Remora.Discord.Gateway.Extensions;
 using RemoraDiscordBot.Core.Commands;
 using RemoraDiscordBot.Core.Exceptions;
+using RemoraDiscordBot.Core.Infrastructure;
 using RemoraDiscordBot.Core.Responders.AnyResponderLogging;
 using RemoraDiscordBot.Plugins.Experience;
 
@@ -28,6 +29,7 @@ public static class Setup
                 .AddDiscordBotCommands()
                 .AddExperiencePlugin()
                 .AddAnyEventResponderLogging()
+                .AddDiscordBotInfrastructure()
             ;
     }
 }
