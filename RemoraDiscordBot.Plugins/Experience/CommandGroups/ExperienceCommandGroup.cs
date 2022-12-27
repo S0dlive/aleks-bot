@@ -5,6 +5,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Remora.Commands.Attributes;
 using Remora.Commands.Groups;
 using Remora.Discord.API.Abstractions.Objects;
@@ -26,6 +27,7 @@ public class ExperienceCommandGroup
 {
     private readonly ICommandContext _commandContext;
     private readonly FeedbackService _feedbackService;
+    private readonly ILogger<ExperienceCommandGroup> _logger;
     private readonly IMediator _mediator;
     private readonly IDiscordRestUserAPI _userApi;
 
@@ -33,12 +35,14 @@ public class ExperienceCommandGroup
         ICommandContext commandContext,
         IMediator mediator,
         IDiscordRestUserAPI userApi,
-        FeedbackService feedbackService)
+        FeedbackService feedbackService,
+        ILogger<ExperienceCommandGroup> logger)
     {
         _commandContext = commandContext;
         _mediator = mediator;
         _userApi = userApi;
         _feedbackService = feedbackService;
+        _logger = logger;
     }
 
     [Command("amount")]
@@ -53,7 +57,7 @@ public class ExperienceCommandGroup
         if (!_commandContext.TryGetGuildID(out var instigatorGuildId))
             throw new InvalidOperationException("Could not get the guild ID.");
 
-        if (user is {IsBot.Value: true})
+        if (user?.IsBot is {HasValue: true, Value: true})
             return (Result) await _feedbackService.SendContextualEmbedAsync(
                 new Embed
                 {
