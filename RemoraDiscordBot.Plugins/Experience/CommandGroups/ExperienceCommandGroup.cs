@@ -95,6 +95,8 @@ public class ExperienceCommandGroup
             CancellationToken);
         var level = await _mediator.Send(
             new GetLevelByUserQuery(userToCheck.Value, instigatorGuildId.Value));
+        var xpNeeded = await _mediator.Send(
+            new GetExperienceNeededByUserQuery(userToCheck.Value, instigatorGuildId.Value));
 
         var instigatorUser = await _userApi.GetUserAsync(instigatorId.Value, CancellationToken);
 
@@ -119,6 +121,12 @@ public class ExperienceCommandGroup
                     "XP",
                     xp.ToString(),
                     true
+                ),
+                new EmbedField
+                (
+                    "XP Needed",
+                    xpNeeded.ToString(),
+                    false
                 )
             }
         };
