@@ -29,10 +29,20 @@ public class MessageCreateGrantExperienceResponder
         var instigator = gatewayEvent.Author;
         var messageLength = gatewayEvent.Content.Length;
         var words = gatewayEvent.Content.Split(' ').Distinct().ToImmutableArray();
-        var xpEarned = (int)(Math.Pow(words.Length + messageLength, 2) / 1000);
+        var xpEarned = CalculateExperience(messageLength, words.Length);
 
         await _mediator.Send(new GrantExperienceAmountToUserCommand(instigator.ID, xpEarned), ct);
 
         return Result.FromSuccess();
+    }
+
+    private int CalculateExperience(int messageLength, int wordCount)
+    {
+        return (int) (Math.Pow(wordCount + messageLength, 2) / 1000);
+    }
+    
+    private int CalculateExperienceNeeded(int level)
+    {
+        return (int) (Math.Pow(level, 2) * 1000);
     }
 }
