@@ -3,11 +3,11 @@
 // See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
-using System.Drawing;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Remora.Commands.Attributes;
 using Remora.Commands.Groups;
+using Remora.Discord.API;
 using Remora.Discord.API.Abstractions.Objects;
 using Remora.Discord.API.Abstractions.Rest;
 using Remora.Discord.API.Objects;
@@ -15,7 +15,6 @@ using Remora.Discord.Commands.Contexts;
 using Remora.Discord.Commands.Extensions;
 using Remora.Discord.Commands.Feedback.Services;
 using Remora.Results;
-using RemoraDiscordBot.Business.Attributes;
 using RemoraDiscordBot.Business.Colors;
 using RemoraDiscordBot.Business.Infrastructure.Attributes;
 using RemoraDiscordBot.Plugins.Experience.Queries;
@@ -50,8 +49,7 @@ public class ExperienceCommandGroup
     [Command("amount")]
     [Description("Gets the amount of XP you have or the passed user has.")]
     public async Task<IResult> XpCommandAsync(
-        [Description("Argument user to get the experience amount from")]
-        [NoBot]
+        [Description("Argument user to get the experience amount from")] [NoBot]
         IUser? user = null)
     {
         if (!_commandContext.TryGetUserID(out var instigatorId))
@@ -77,5 +75,56 @@ public class ExperienceCommandGroup
             ct: CancellationToken);
 
         return await Task.FromResult<IResult>(Result.FromSuccess());
+    }
+
+    [Command("profile")]
+    [Description("Gets the profile of the user.")]
+    public async Task<Result> ProfileCommandAsync(
+        [Description("Argument user to get the experience amount from")] [NoBot]
+        IUser? user = null)
+    {
+        if (!_commandContext.TryGetUserID(out var instigatorId))
+            throw new InvalidOperationException("Could not get the user ID.");
+
+        if (!_commandContext.TryGetGuildID(out var instigatorGuildId))
+            throw new InvalidOperationException("Could not get the guild ID.");
+
+        var userToCheck = user?.ID ?? instigatorId;
+        var xp = await _mediator.Send(
+            new GetExperienceAmountByUserQuery(userToCheck.Value, instigatorGuildId.Value),
+            CancellationToken);
+        var level = await _mediator.Send(
+            new GetLevelByUserQuery(userToCheck.Value, instigatorGuildId.Value));
+
+        var instigatorUser = await _userApi.GetUserAsync(instigatorId.Value, CancellationToken);
+
+        var embed = new Embed
+        {
+            Title = $"Profile for {user?.Username ?? instigatorUser.Entity.Username}",
+            Colour = DiscordTransparentColor.Value,
+            Thumbnail = new EmbedThumbnail
+            (
+                CDN.GetUserAvatarUrl(user ?? instigatorUser.Entity).Entity.AbsoluteUri
+            ),
+            Fields = new[]
+            {
+                new EmbedField
+                (
+                    "Level",
+                    level.ToString(),
+                    true
+                ),
+                new EmbedField
+                (
+                    "XP",
+                    xp.ToString(),
+                    true
+                )
+            }
+        };
+        
+        await _feedbackService.SendContextualEmbedAsync(embed, ct: CancellationToken);
+
+        return Result.FromSuccess();
     }
 }
