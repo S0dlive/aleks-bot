@@ -2,13 +2,9 @@
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
-using System.Diagnostics;
+using Remora.Results;
 
-namespace RemoraDiscordBot.Business.Attributes;
+namespace RemoraDiscordBot.Core.Infrastructure.Errors;
 
-[AttributeUsage(AttributeTargets.Method)]
-public class NoBotConditionalAttribute
-    : Attribute
-{
-    
-}
+public sealed record NonSelfActionableError(string Message)
+    : ResultError(Message);

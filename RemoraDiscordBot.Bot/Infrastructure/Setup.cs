@@ -13,6 +13,7 @@ public static class Setup
     {
         return serviceCollection
                 .AddPostExecutionEvent<CommandPostExecutionEvent>()
+                .AddPreparationErrorEvent<PreparationErrorEvent>()
             ;
     }
 }

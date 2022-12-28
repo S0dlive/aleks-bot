@@ -15,7 +15,9 @@ using Remora.Discord.Commands.Contexts;
 using Remora.Discord.Commands.Extensions;
 using Remora.Discord.Commands.Feedback.Services;
 using Remora.Results;
+using RemoraDiscordBot.Business.Attributes;
 using RemoraDiscordBot.Business.Colors;
+using RemoraDiscordBot.Business.Infrastructure.Attributes;
 using RemoraDiscordBot.Plugins.Experience.Queries;
 
 namespace RemoraDiscordBot.Plugins.Experience.CommandGroups;
@@ -49,6 +51,7 @@ public class ExperienceCommandGroup
     [Description("Gets the amount of XP you have or the passed user has.")]
     public async Task<IResult> XpCommandAsync(
         [Description("Argument user to get the experience amount from")]
+        [NoBot]
         IUser? user = null)
     {
         if (!_commandContext.TryGetUserID(out var instigatorId))
@@ -57,8 +60,6 @@ public class ExperienceCommandGroup
         if (!_commandContext.TryGetGuildID(out var instigatorGuildId))
             throw new InvalidOperationException("Could not get the guild ID.");
 
-        
-
         var userToCheck = user?.ID ?? instigatorId;
         var xp = await _mediator.Send(
             new GetExperienceAmountByUserQuery(userToCheck.Value, instigatorGuildId.Value),
@@ -66,7 +67,7 @@ public class ExperienceCommandGroup
 
         var instigatorUser = await _userApi.GetUserAsync(instigatorId.Value, CancellationToken);
 
-        return (Result) await _feedbackService.SendContextualEmbedAsync(
+        await _feedbackService.SendContextualEmbedAsync(
             new Embed
             {
                 Title = $"Experience for {user?.Username ?? instigatorUser.Entity.Username}",
@@ -74,5 +75,7 @@ public class ExperienceCommandGroup
                 Colour = DiscordTransparentColor.Value
             },
             ct: CancellationToken);
+
+        return await Task.FromResult<IResult>(Result.FromSuccess());
     }
 }

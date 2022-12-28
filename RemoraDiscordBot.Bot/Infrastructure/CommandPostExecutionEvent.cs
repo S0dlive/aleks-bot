@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Extensions.Logging;
+using Remora.Discord.API.Abstractions.Rest;
 using Remora.Discord.Commands.Contexts;
 using Remora.Discord.Commands.Services;
 using Remora.Results;
@@ -19,18 +20,20 @@ public class CommandPostExecutionEvent
         _logger = logger;
     }
 
-    public Task<Result> AfterExecutionAsync(
+    public async Task<Result> AfterExecutionAsync(
         ICommandContext context,
         IResult commandResult,
         CancellationToken ct = default)
     {
-        if (commandResult.IsSuccess) return Task.FromResult(Result.FromSuccess());
 
-        _logger.LogError(
-            "Command {CommandName} failed with error {Error}",
-            context.Command.Command.Node.CommandMethod.Name,
-            commandResult.Error);
+        if (!commandResult.IsSuccess)
+        {
+            _logger.LogError(
+                "Command {CommandName} failed with error {Error}",
+                context.Command.Command.Node.CommandMethod.Name,
+                commandResult.Error);
+        }
 
-        return Task.FromResult(Result.FromError(commandResult.Error));
+        return Result.FromSuccess();
     }
 }
