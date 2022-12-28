@@ -3,8 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Extensions.Logging;
+using Remora.Discord.API.Abstractions.Objects;
 using Remora.Discord.Commands.Contexts;
 using Remora.Discord.Commands.Extensions;
+using Remora.Discord.Commands.Feedback.Messages;
 using Remora.Discord.Commands.Feedback.Services;
 using Remora.Discord.Commands.Services;
 using Remora.Results;
@@ -36,6 +38,10 @@ public class PreparationErrorEvent
         return (Result) await _feedbackService.SendContextualErrorAsync(
             preparationResult.Inner?.Inner?.Error?.Message,
             userId.Value,
-            ct: ct);
+            new FeedbackMessageOptions
+            {
+                MessageFlags = MessageFlags.Ephemeral
+            },
+            ct);
     }
 }

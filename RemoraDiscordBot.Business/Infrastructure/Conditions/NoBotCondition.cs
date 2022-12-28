@@ -16,7 +16,7 @@ public class NoBotCondition
     public ValueTask<Result> CheckAsync(NoBotAttribute attribute, IUser data, CancellationToken ct = default)
     {
         return ValueTask.FromResult(data?.IsBot is {HasValue: true, Value: true}
-            ? Result.FromError(new NoBotError("This command cannot be used by bots."))
+            ? Result.FromError(new NoBotError("This command cannot be used on bots."))
             : Result.FromSuccess());
     }
 }
