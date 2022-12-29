@@ -16,6 +16,7 @@ using Remora.Discord.Commands.Extensions;
 using Remora.Discord.Commands.Feedback.Services;
 using Remora.Results;
 using RemoraDiscordBot.Business.Colors;
+using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Business.Infrastructure.Attributes;
 using RemoraDiscordBot.Plugins.Experience.Queries;
 
@@ -31,19 +32,22 @@ public class ExperienceCommandGroup
     private readonly ILogger<ExperienceCommandGroup> _logger;
     private readonly IMediator _mediator;
     private readonly IDiscordRestUserAPI _userApi;
+    private readonly IDiscordRestGuildAPI _guildApi;
 
     public ExperienceCommandGroup(
         ICommandContext commandContext,
         IMediator mediator,
         IDiscordRestUserAPI userApi,
         FeedbackService feedbackService,
-        ILogger<ExperienceCommandGroup> logger)
+        ILogger<ExperienceCommandGroup> logger, 
+        IDiscordRestGuildAPI guildApi)
     {
         _commandContext = commandContext;
         _mediator = mediator;
         _userApi = userApi;
         _feedbackService = feedbackService;
         _logger = logger;
+        _guildApi = guildApi;
     }
 
     [Command("amount")]
@@ -112,8 +116,45 @@ public class ExperienceCommandGroup
             {
                 new("Level", level.ToString(), true),
                 new("XP", xp.ToString(), true),
-                new("XP Needed", xpNeeded.ToString(), true),
-            },
+                new("XP Needed", xpNeeded.ToString(), true)
+            }
+        };
+
+        await _feedbackService.SendContextualEmbedAsync(embed, ct: CancellationToken);
+
+        return Result.FromSuccess();
+    }
+
+    [Command("leaderboard")]
+    [Description("Gets the leaderboard of the guild.")]
+    public async Task<Result> LeaderboardCommandAsync()
+    {
+        if (!_commandContext.TryGetGuildID(out var instigatorGuildId))
+            throw new InvalidOperationException("Could not get the guild ID.");
+
+        var leaderboard = await _mediator.Send(
+            new GetLeaderBoardQuery(instigatorGuildId.Value));
+
+        var fields = new List<EmbedField>();
+
+        for (var i = 0; i < leaderboard.Count; i++)
+        {
+            var iteratorUser = await _userApi.GetUserAsync(leaderboard[i].UserId.ToSnowflake(), CancellationToken);
+
+            fields.Add(new EmbedField(
+                $"{i + 1}. {iteratorUser.Entity.Username}",
+                $"Level: {leaderboard[i].Level}\nXP: {leaderboard[i].XpAmount}"));
+        }
+        
+        var guild = await _guildApi.GetGuildAsync(instigatorGuildId.Value, ct: CancellationToken);
+        var iconUrl = CDN.GetGuildIconUrl(guild.Entity);
+        
+        var embed = new Embed
+        {
+            Title = $"Leaderboard for **{guild.Entity.Name}**",
+            Colour = DiscordTransparentColor.Value,
+            Fields = fields,
+            Thumbnail = iconUrl.IsSuccess ? new EmbedThumbnail(iconUrl.Entity.AbsoluteUri) : null
         };
 
         await _feedbackService.SendContextualEmbedAsync(embed, ct: CancellationToken);
