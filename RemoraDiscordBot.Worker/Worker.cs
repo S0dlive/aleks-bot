@@ -43,8 +43,17 @@ public class Worker
 
         var guildIdParsed = ulong.Parse(guildId);
 
-        var updateSlash =
-            await _slashService.UpdateSlashCommandsAsync(new Snowflake(guildIdParsed), ct: stoppingToken);
+        var development = _configuration["DOTNET_ENVIRONMENT"] == "Development";
+
+        _logger.LogInformation("Your bot is running in {Environment} mode.", development
+            ? "Development"
+            : "Production");
+
+        var updateSlash = development switch
+        {
+            true => await _slashService.UpdateSlashCommandsAsync(new Snowflake(guildIdParsed), ct: stoppingToken),
+            false => await _slashService.UpdateSlashCommandsAsync(ct: stoppingToken)
+        };
 
         if (!updateSlash.IsSuccess)
             _logger.LogWarning("Failed to update slash commands: {Reason}", updateSlash.Error.Message);
