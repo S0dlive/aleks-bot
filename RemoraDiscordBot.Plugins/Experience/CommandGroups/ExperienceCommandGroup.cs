@@ -127,7 +127,7 @@ public class ExperienceCommandGroup
 
     [Group("leaderboard")]
     public class LeaderExperienceSubCommandGroup
-        : ExperienceCommandGroup
+        : CommandGroup
     {
         private new readonly ICommandContext _commandContext;
         private new readonly FeedbackService _feedbackService;
@@ -142,7 +142,6 @@ public class ExperienceCommandGroup
             FeedbackService feedbackService,
             ILogger<ExperienceCommandGroup> logger,
             IDiscordRestGuildAPI guildApi) 
-            : base(commandContext, mediator, userApi, feedbackService, logger, guildApi)
         {
             _commandContext = commandContext;
             _mediator = mediator;
