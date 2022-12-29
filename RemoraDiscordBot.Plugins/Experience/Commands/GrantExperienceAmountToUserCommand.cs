@@ -7,5 +7,5 @@ using Remora.Rest.Core;
 
 namespace RemoraDiscordBot.Plugins.Experience.Commands;
 
-public sealed record GrantExperienceAmountToUserCommand(Snowflake UserID, int Amount)
+public sealed record GrantExperienceAmountToUserCommand(Snowflake UserID, Snowflake ChannelId, int Amount)
     : IRequest;

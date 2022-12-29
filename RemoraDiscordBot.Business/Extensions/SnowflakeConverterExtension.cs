@@ -8,9 +8,10 @@ namespace RemoraDiscordBot.Business.Extensions;
 
 public static class SnowflakeConverterExtension
 {
-    public static Snowflake ToSnowflake(this ulong value)
+    public static Snowflake ToSnowflake(this long value)
     {
-        return new Snowflake(value);
+        var ulongValue = unchecked((ulong)value);
+        return new Snowflake(ulongValue);
     }
 
     public static long ToLong(this Snowflake value)
