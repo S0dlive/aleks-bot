@@ -108,29 +108,14 @@ public class ExperienceCommandGroup
             (
                 CDN.GetUserAvatarUrl(user ?? instigatorUser.Entity).Entity.AbsoluteUri
             ),
-            Fields = new[]
+            Fields = new List<EmbedField>
             {
-                new EmbedField
-                (
-                    "Level",
-                    level.ToString(),
-                    true
-                ),
-                new EmbedField
-                (
-                    "XP",
-                    xp.ToString(),
-                    true
-                ),
-                new EmbedField
-                (
-                    "XP Needed",
-                    xpNeeded.ToString(),
-                    false
-                )
-            }
+                new("Level", level.ToString(), true),
+                new("XP", xp.ToString(), true),
+                new("XP Needed", xpNeeded.ToString(), true),
+            },
         };
-        
+
         await _feedbackService.SendContextualEmbedAsync(embed, ct: CancellationToken);
 
         return Result.FromSuccess();

@@ -30,6 +30,7 @@ public class MessageCreateGrantExperienceResponder
         var messageLength = gatewayEvent.Content.Length;
         var words = gatewayEvent.Content.Split(' ').Distinct().ToImmutableArray();
         var xpEarned = CalculateExperience(messageLength, words.Length);
+        var guildId = gatewayEvent.GuildID;
 
         await _mediator.Send(new GrantExperienceAmountToUserCommand(instigator.ID, xpEarned), ct);
 
@@ -41,8 +42,5 @@ public class MessageCreateGrantExperienceResponder
         return (int) (Math.Pow(wordCount + messageLength, 2) / 1000);
     }
     
-    private int CalculateExperienceNeeded(int level)
-    {
-        return (int) (Math.Pow(level, 2) * 1000);
-    }
+    
 }
