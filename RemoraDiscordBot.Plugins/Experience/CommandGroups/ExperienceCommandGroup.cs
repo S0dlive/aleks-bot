@@ -29,17 +29,17 @@ public class ExperienceCommandGroup
 {
     private readonly ICommandContext _commandContext;
     private readonly FeedbackService _feedbackService;
+    private readonly IDiscordRestGuildAPI _guildApi;
     private readonly ILogger<ExperienceCommandGroup> _logger;
     private readonly IMediator _mediator;
     private readonly IDiscordRestUserAPI _userApi;
-    private readonly IDiscordRestGuildAPI _guildApi;
 
     public ExperienceCommandGroup(
         ICommandContext commandContext,
         IMediator mediator,
         IDiscordRestUserAPI userApi,
         FeedbackService feedbackService,
-        ILogger<ExperienceCommandGroup> logger, 
+        ILogger<ExperienceCommandGroup> logger,
         IDiscordRestGuildAPI guildApi)
     {
         _commandContext = commandContext;
@@ -125,40 +125,99 @@ public class ExperienceCommandGroup
         return Result.FromSuccess();
     }
 
-    [Command("leaderboard")]
-    [Description("Gets the leaderboard of the guild.")]
-    public async Task<Result> LeaderboardCommandAsync()
+    [Group("leaderboard")]
+    public class LeaderExperienceSubCommandGroup
+        : ExperienceCommandGroup
     {
-        if (!_commandContext.TryGetGuildID(out var instigatorGuildId))
-            throw new InvalidOperationException("Could not get the guild ID.");
+        private new readonly ICommandContext _commandContext;
+        private new readonly FeedbackService _feedbackService;
+        private new readonly IDiscordRestGuildAPI _guildApi;
+        private new readonly IMediator _mediator;
+        private new readonly IDiscordRestUserAPI _userApi;
 
-        var leaderboard = await _mediator.Send(
-            new GetLeaderBoardQuery(instigatorGuildId.Value));
-
-        var fields = new List<EmbedField>();
-
-        for (var i = 0; i < leaderboard.Count; i++)
+        public LeaderExperienceSubCommandGroup(
+            ICommandContext commandContext,
+            IMediator mediator,
+            IDiscordRestUserAPI userApi,
+            FeedbackService feedbackService,
+            ILogger<ExperienceCommandGroup> logger,
+            IDiscordRestGuildAPI guildApi) 
+            : base(commandContext, mediator, userApi, feedbackService, logger, guildApi)
         {
-            var iteratorUser = await _userApi.GetUserAsync(leaderboard[i].UserId.ToSnowflake(), CancellationToken);
-
-            fields.Add(new EmbedField(
-                $"{i + 1}. {iteratorUser.Entity.Username}",
-                $"Level: {leaderboard[i].Level}\nXP: {leaderboard[i].XpAmount}"));
+            _commandContext = commandContext;
+            _mediator = mediator;
+            _userApi = userApi;
+            _feedbackService = feedbackService;
+            _guildApi = guildApi;
         }
-        
-        var guild = await _guildApi.GetGuildAsync(instigatorGuildId.Value, ct: CancellationToken);
-        var iconUrl = CDN.GetGuildIconUrl(guild.Entity);
-        
-        var embed = new Embed
+
+        [Command("guild")]
+        [Description("Gets the guild leaderboard.")]
+        public async Task<Result> LeaderboardCommandAsync()
         {
-            Title = $"Leaderboard for **{guild.Entity.Name}**",
-            Colour = DiscordTransparentColor.Value,
-            Fields = fields,
-            Thumbnail = iconUrl.IsSuccess ? new EmbedThumbnail(iconUrl.Entity.AbsoluteUri) : null
-        };
+            if (!_commandContext.TryGetGuildID(out var instigatorGuildId))
+                throw new InvalidOperationException("Could not get the guild ID.");
 
-        await _feedbackService.SendContextualEmbedAsync(embed, ct: CancellationToken);
+            var leaderboard = await _mediator.Send(
+                new GetLeaderBoardQuery(instigatorGuildId.Value));
 
-        return Result.FromSuccess();
+            var fields = new List<EmbedField>();
+
+            for (var i = 0; i < leaderboard.Count; i++)
+            {
+                var iteratorUser =
+                    await _userApi.GetUserAsync(leaderboard[i].UserId.ToSnowflake(), CancellationToken.None);
+
+                fields.Add(new EmbedField(
+                    $"{i + 1}. {iteratorUser.Entity.Username}",
+                    $"Level: {leaderboard[i].Level}\nXP: {leaderboard[i].XpAmount}"));
+            }
+
+            var guild = await _guildApi.GetGuildAsync(instigatorGuildId.Value, ct: CancellationToken.None);
+            var iconUrl = CDN.GetGuildIconUrl(guild.Entity);
+
+            var embed = new Embed
+            {
+                Title = $"Leaderboard for **{guild.Entity.Name}**",
+                Colour = DiscordTransparentColor.Value,
+                Fields = fields,
+                Thumbnail = iconUrl.IsSuccess ? new EmbedThumbnail(iconUrl.Entity.AbsoluteUri) : null
+            };
+
+            await _feedbackService.SendContextualEmbedAsync(embed, ct: CancellationToken.None);
+
+            return Result.FromSuccess();
+        }
+
+        [Command("global")]
+        [Description("Gets the global leaderboard.")]
+        public async Task<Result> GlobalLeaderboardCommandAsync()
+        {
+            var leaderboard = await _mediator.Send(
+                new GetGlobalLeaderBoardQuery());
+
+            var fields = new List<EmbedField>();
+
+            for (var i = 0; i < leaderboard.Count; i++)
+            {
+                var iteratorUser =
+                    await _userApi.GetUserAsync(leaderboard[i].UserId.ToSnowflake(), CancellationToken.None);
+
+                fields.Add(new EmbedField(
+                    $"{i + 1}. {iteratorUser.Entity.Username}",
+                    $"Level: {leaderboard[i].Level}\nXP: {leaderboard[i].XpAmount}"));
+            }
+
+            var embed = new Embed
+            {
+                Title = "Global Leaderboard",
+                Colour = DiscordTransparentColor.Value,
+                Fields = fields
+            };
+
+            await _feedbackService.SendContextualEmbedAsync(embed, ct: CancellationToken.None);
+
+            return Result.FromSuccess();
+        }
     }
 }
