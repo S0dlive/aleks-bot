@@ -25,5 +25,11 @@ public class RemoraDiscordBotDbContext
         _loggerFactory = new LoggerFactory();
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserGuildXp>()
+            .HasKey(x => new { x.UserId, x.GuildId });
+    }
+
     public DbSet<UserGuildXp> UserGuildXps { get; set; } = null!;
 }
