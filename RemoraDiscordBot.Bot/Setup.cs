@@ -9,6 +9,7 @@ using Remora.Discord.Commands.Extensions;
 using Remora.Discord.Gateway;
 using Remora.Discord.Gateway.Extensions;
 using RemoraDiscordBot.Business;
+using RemoraDiscordBot.Core.CommandGroups;
 using RemoraDiscordBot.Core.Commands;
 using RemoraDiscordBot.Core.Exceptions;
 using RemoraDiscordBot.Core.Infrastructure;
@@ -40,6 +41,7 @@ public static class Setup
                                                    | GatewayIntents.GuildVoiceStates;
                 })
                 .AddDiscordCommands(true)
+                .AddDiscordBotCoreCommands()
                 .AddDiscordBotCommands()
                 .AddExperiencePlugin()
                 .AddAnyEventResponderLogging()
