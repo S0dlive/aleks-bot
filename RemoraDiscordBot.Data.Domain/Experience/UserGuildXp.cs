@@ -14,7 +14,7 @@ public class UserGuildXp
         GuildId = guildId;
         XpAmount = 0;
         Level = 0;
-        XpNeededToLevelUp = 0;
+        XpNeededToLevelUp = CalculateExperienceNeeded(XpAmount, Level);
     }
 
     [Key] public long UserId { get; set; }
@@ -26,4 +26,10 @@ public class UserGuildXp
     public long Level { get; set; }
 
     public long XpNeededToLevelUp { get; set; }
+
+    private static int CalculateExperienceNeeded(long xp, long level)
+    {
+        return (int) (100 * Math.Pow(level + 1, 2))
+               - (int) xp;
+    }
 }
