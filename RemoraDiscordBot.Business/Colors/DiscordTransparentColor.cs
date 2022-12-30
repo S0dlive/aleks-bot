@@ -8,6 +8,6 @@ namespace RemoraDiscordBot.Business.Colors;
 
 public struct DiscordTransparentColor
 {
-    //36393E
-    public static Color Value => Color.FromArgb(55, 57, 63);
+    //2F3136
+    public static Color Value => Color.FromArgb(47, 49, 54);
 }
