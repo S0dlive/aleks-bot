@@ -42,7 +42,6 @@ public static class Setup
                 })
                 .AddDiscordCommands(true)
                 .AddDiscordBotCoreCommands()
-                .AddDiscordBotCommands()
                 .AddExperiencePlugin()
                 .AddAnyEventResponderLogging()
                 .AddDiscordBotInfrastructure()
