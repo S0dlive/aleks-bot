@@ -23,6 +23,9 @@ public class NonSelfActionableCondition
         _commandContext = commandContext;
     }
 
+    // https://github.com/VelvetThePanda 
+    // This code belongs to Velvet, I just adapted it to my needs.
+    // It comes from the Velvet's Discord Bot Silk project.
     public async ValueTask<Result> CheckAsync(NonSelfActionableAttribute attribute, IUser data, CancellationToken ct = default)
     {
         var user = _commandContext switch
