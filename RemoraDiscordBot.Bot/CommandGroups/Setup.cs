@@ -4,6 +4,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Remora.Commands.Extensions;
+using RemoraDiscordBot.Core.Commands;
 
 namespace RemoraDiscordBot.Core.CommandGroups;
 
@@ -14,6 +15,7 @@ public static class Setup
         serviceCollection
             .AddCommandTree()
             .WithCommandGroup<CreditCommandGroup>()
+            .WithCommandGroup<DiagnosticCommands>()
             .Finish()
             ;
 
