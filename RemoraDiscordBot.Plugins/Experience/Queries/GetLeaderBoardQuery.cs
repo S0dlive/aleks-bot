@@ -10,4 +10,4 @@ using RemoraDiscordBot.Data.Domain.Xp;
 namespace RemoraDiscordBot.Plugins.Experience.Queries;
 
 public sealed record GetLeaderBoardQuery(Snowflake GuildId)
-    : IRequest<Collection<UserGuildXp>>;
+    : IRequest<IEnumerable<UserGuildXp>>;

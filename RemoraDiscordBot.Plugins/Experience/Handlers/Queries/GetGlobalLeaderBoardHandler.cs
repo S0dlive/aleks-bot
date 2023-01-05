@@ -11,14 +11,14 @@ using RemoraDiscordBot.Plugins.Experience.Queries;
 namespace RemoraDiscordBot.Plugins.Experience.Handlers;
 
 public sealed record GetGlobalLeaderBoardHandler(RemoraDiscordBotDbContext DbContext)
-    : IRequestHandler<GetGlobalLeaderBoardQuery, Collection<UserGuildXp>>
+    : IRequestHandler<GetGlobalLeaderBoardQuery, IEnumerable<UserGuildXp>>
 {
-    public async Task<Collection<UserGuildXp>> Handle(GetGlobalLeaderBoardQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<UserGuildXp>> Handle(GetGlobalLeaderBoardQuery request, CancellationToken cancellationToken)
     {
         var leaderBoard = DbContext.UserGuildXps
             .OrderByDescending(x => x.Level)
             .ToList();
 
-        return new Collection<UserGuildXp>(leaderBoard);
+        return new ReadOnlyCollection<UserGuildXp>(leaderBoard);
     }
 }

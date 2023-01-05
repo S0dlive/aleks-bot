@@ -9,4 +9,4 @@ using RemoraDiscordBot.Data.Domain.Xp;
 namespace RemoraDiscordBot.Plugins.Experience.Queries;
 
 public sealed record GetGlobalLeaderBoardQuery
-    : IRequest<Collection<UserGuildXp>>;
+    : IRequest<IEnumerable<UserGuildXp>>;

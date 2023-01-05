@@ -13,9 +13,9 @@ using RemoraDiscordBot.Plugins.Experience.Queries;
 namespace RemoraDiscordBot.Plugins.Experience.Handlers;
 
 public sealed record GetLeaderBoardByLengthHandler(RemoraDiscordBotDbContext DbContext)
-    : IRequestHandler<GetLeaderBoardQuery, Collection<UserGuildXp>>
+    : IRequestHandler<GetLeaderBoardQuery, IEnumerable<UserGuildXp>>
 {
-    public async Task<Collection<UserGuildXp>> Handle(
+    public async Task<IEnumerable<UserGuildXp>> Handle(
         GetLeaderBoardQuery request,
         CancellationToken cancellationToken)
     {
@@ -24,6 +24,6 @@ public sealed record GetLeaderBoardByLengthHandler(RemoraDiscordBotDbContext DbC
             .OrderByDescending(x => x.Level)
             .ToListAsync(cancellationToken);
 
-        return new Collection<UserGuildXp>(await leaderBoard);
+        return new ReadOnlyCollection<UserGuildXp>(await leaderBoard);
     }
 }
