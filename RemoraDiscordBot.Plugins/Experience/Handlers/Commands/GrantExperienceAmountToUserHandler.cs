@@ -94,7 +94,7 @@ public sealed class GrantExperienceAmountToUserHandler
     }
 
 
-    private static (long, long) CalculateExperienceAndLevel(
+    private static (long NewExperience, long NewLevel) CalculateExperienceAndLevel(
         long currentExperience,
         long currentLevel,
         long additionalExperience)
