@@ -28,8 +28,8 @@ public class MessageCreateGrantExperienceResponder
 
         var instigator = gatewayEvent.Author;
         var messageLength = gatewayEvent.Content.Length;
-        var words = gatewayEvent.Content.Split(' ').Distinct().ToImmutableArray();
-        var xpEarned = CalculateExperience(messageLength, words.Length);
+        var wordsCount = gatewayEvent.Content.Split(' ').Distinct().Count();
+        var xpEarned = CalculateExperience(messageLength, wordsCount);
 
         await _mediator.Send(new GrantExperienceAmountToUserCommand(instigator.ID, gatewayEvent.ChannelID ,xpEarned), ct);
 

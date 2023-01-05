@@ -29,8 +29,6 @@ public class ExperienceCommandGroup
 {
     private readonly ICommandContext _commandContext;
     private readonly FeedbackService _feedbackService;
-    private readonly IDiscordRestGuildAPI _guildApi;
-    private readonly ILogger<ExperienceCommandGroup> _logger;
     private readonly IMediator _mediator;
     private readonly IDiscordRestUserAPI _userApi;
 
@@ -38,22 +36,19 @@ public class ExperienceCommandGroup
         ICommandContext commandContext,
         IMediator mediator,
         IDiscordRestUserAPI userApi,
-        FeedbackService feedbackService,
-        ILogger<ExperienceCommandGroup> logger,
-        IDiscordRestGuildAPI guildApi)
+        FeedbackService feedbackService)
     {
         _commandContext = commandContext;
         _mediator = mediator;
         _userApi = userApi;
         _feedbackService = feedbackService;
-        _logger = logger;
-        _guildApi = guildApi;
     }
 
     [Command("amount")]
     [Description("Gets the amount of XP you have or the passed user has.")]
     public async Task<IResult> XpCommandAsync(
-        [Description("Argument user to get the experience amount from")] [NoBot]
+        [Description("Argument user to get the experience amount from")]
+        [NoBot]
         IUser? user = null)
     {
         if (!_commandContext.TryGetUserID(out var instigatorId))
@@ -84,7 +79,8 @@ public class ExperienceCommandGroup
     [Command("profile")]
     [Description("Gets the profile of the user.")]
     public async Task<Result> ProfileCommandAsync(
-        [Description("Argument user to get the experience amount from")] [NoBot]
+        [Description("Argument user to get the experience amount from")] 
+        [NoBot]
         IUser? user = null)
     {
         if (!_commandContext.TryGetUserID(out var instigatorId))
@@ -129,11 +125,11 @@ public class ExperienceCommandGroup
     public class LeaderExperienceSubCommandGroup
         : CommandGroup
     {
-        private new readonly ICommandContext _commandContext;
-        private new readonly FeedbackService _feedbackService;
-        private new readonly IDiscordRestGuildAPI _guildApi;
-        private new readonly IMediator _mediator;
-        private new readonly IDiscordRestUserAPI _userApi;
+        private readonly ICommandContext _commandContext;
+        private readonly FeedbackService _feedbackService;
+        private readonly IDiscordRestGuildAPI _guildApi;
+        private readonly IMediator _mediator;
+        private readonly IDiscordRestUserAPI _userApi;
 
         public LeaderExperienceSubCommandGroup(
             ICommandContext commandContext,
@@ -141,7 +137,7 @@ public class ExperienceCommandGroup
             IDiscordRestUserAPI userApi,
             FeedbackService feedbackService,
             ILogger<ExperienceCommandGroup> logger,
-            IDiscordRestGuildAPI guildApi) 
+            IDiscordRestGuildAPI guildApi)
         {
             _commandContext = commandContext;
             _mediator = mediator;

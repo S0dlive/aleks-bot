@@ -4,14 +4,10 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Remora.Discord.API.Abstractions.Gateway.Commands;
-using Remora.Discord.Gateway;
 using RemoraDiscordBot.Core;
-using RemoraDiscordBot.Core.Commands;
 using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.Experience;
 using RemoraDiscordBot.Worker;
-using Setup = RemoraDiscordBot.Plugins.Experience.Setup;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -19,23 +15,21 @@ var host = Host.CreateDefaultBuilder(args)
         services
             .AddHostedService<Worker>()
             .AddDbContext<RemoraDiscordBotDbContext>(options =>
+            {
                 options
                     .UseMySql(
                         hostContext.Configuration["ConnectionStrings:DefaultConnection"],
                         ServerVersion.AutoDetect(hostContext.Configuration["ConnectionStrings:DefaultConnection"]))
-                    .LogTo(Console.WriteLine, LogLevel.Information))
+                    .LogTo(Console.WriteLine, LogLevel.Information);
+            })
             .AddDiscordBot(hostContext.Configuration)
             .AddMediatR(AppDomain.CurrentDomain.GetAssemblies())
-            
-            .AddExperiencePlugin()
-            ;
+            .AddExperiencePlugin();
     })
-    .ConfigureLogging
-    (
+    .ConfigureLogging(
         c => c
             .AddConsole()
-            .AddFilter("System.Net.Http.HttpClient.*.LogicalHandler", LogLevel.Warning)
-            .AddFilter("System.Net.Http.HttpClient.*.ClientHandler", LogLevel.Warning)
+            .AddFilter("System.Net.Http.HttpClient.*", LogLevel.Warning)
     )
     .Build();
 
