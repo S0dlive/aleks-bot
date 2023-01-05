@@ -63,8 +63,7 @@ public sealed class GrantExperienceAmountToUserHandler
     private async Task<UserGuildXp> UpdateExperienceAndLevel(
         UserGuildXp user,
         Snowflake channelId,
-        long experience
-        )
+        long experience)
     {
         // Calculate the new experience and level
         var (newExperience, newLevel) = CalculateExperienceAndLevel(user.XpAmount, user.Level, experience);
