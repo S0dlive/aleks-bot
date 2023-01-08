@@ -47,8 +47,7 @@ public class ExperienceCommandGroup
     [Command("amount")]
     [Description("Gets the amount of XP you have or the passed user has.")]
     public async Task<IResult> XpCommandAsync(
-        [Description("Argument user to get the experience amount from")]
-        [NoBot]
+        [Description("Argument user to get the experience amount from")] [NoBot]
         IUser? user = null)
     {
         if (!_commandContext.TryGetUserID(out var instigatorId))
@@ -79,8 +78,7 @@ public class ExperienceCommandGroup
     [Command("profile")]
     [Description("Gets the profile of the user.")]
     public async Task<Result> ProfileCommandAsync(
-        [Description("Argument user to get the experience amount from")] 
-        [NoBot]
+        [Description("Argument user to get the experience amount from")] [NoBot]
         IUser? user = null)
     {
         if (!_commandContext.TryGetUserID(out var instigatorId))
@@ -158,14 +156,18 @@ public class ExperienceCommandGroup
 
             var fields = new List<EmbedField>();
 
-            for (var i = 0; i < leaderboard.Count; i++)
+            var iteratorCount = 1;
+
+            foreach (var user in leaderboard)
             {
                 var iteratorUser =
-                    await _userApi.GetUserAsync(leaderboard[i].UserId.ToSnowflake(), CancellationToken.None);
+                    await _userApi.GetUserAsync(user.UserId.ToSnowflake(), CancellationToken.None);
 
                 fields.Add(new EmbedField(
-                    $"{i + 1}. {iteratorUser.Entity.Username}",
-                    $"Level: {leaderboard[i].Level}\nXP: {leaderboard[i].XpAmount}"));
+                    $"{iteratorCount}. {iteratorUser.Entity.Username}",
+                    $"Level: {user.Level}\nXP: {user.XpAmount}"));
+
+                iteratorCount++;
             }
 
             var guild = await _guildApi.GetGuildAsync(instigatorGuildId.Value, ct: CancellationToken.None);
@@ -193,14 +195,18 @@ public class ExperienceCommandGroup
 
             var fields = new List<EmbedField>();
 
-            for (var i = 0; i < leaderboard.Count; i++)
+            var iteratorCount = 1;
+
+            foreach (var user in leaderboard)
             {
                 var iteratorUser =
-                    await _userApi.GetUserAsync(leaderboard[i].UserId.ToSnowflake(), CancellationToken.None);
+                    await _userApi.GetUserAsync(user.UserId.ToSnowflake(), CancellationToken.None);
 
                 fields.Add(new EmbedField(
-                    $"{i + 1}. {iteratorUser.Entity.Username}",
-                    $"Level: {leaderboard[i].Level}\nXP: {leaderboard[i].XpAmount}"));
+                    $"{iteratorCount}. {iteratorUser.Entity.Username}",
+                    $"Level: {user.Level}\nXP: {user.XpAmount}"));
+
+                iteratorCount++;
             }
 
             var embed = new Embed
