@@ -6,7 +6,6 @@ using System.Drawing;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OneOf.Types;
 using Remora.Discord.API.Abstractions.Rest;
 using Remora.Discord.Commands.Feedback.Services;
 using Remora.Rest.Core;
@@ -22,14 +21,14 @@ public sealed class GrantExperienceAmountToUserHandler
     : AsyncRequestHandler<GrantExperienceAmountToUserCommand>
 {
     private readonly RemoraDiscordBotDbContext _dbContext;
-    private readonly ILogger<GrantExperienceAmountToUserHandler> _logger;
-    private readonly FeedbackService _feedbackService;
     private readonly IDiscordRestUserAPI _discordRestUserApi;
+    private readonly FeedbackService _feedbackService;
+    private readonly ILogger<GrantExperienceAmountToUserHandler> _logger;
 
     public GrantExperienceAmountToUserHandler(
         RemoraDiscordBotDbContext dbContext,
-        ILogger<GrantExperienceAmountToUserHandler> logger, 
-        FeedbackService feedbackService, 
+        ILogger<GrantExperienceAmountToUserHandler> logger,
+        FeedbackService feedbackService,
         IDiscordRestUserAPI discordRestUserApi)
     {
         _dbContext = dbContext;
@@ -42,16 +41,23 @@ public sealed class GrantExperienceAmountToUserHandler
         GrantExperienceAmountToUserCommand request,
         CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Granting {Amount} experience to {User}", request.Amount, request.UserID.ToLong());
+        _logger.LogInformation("Granting {Amount} experience to {User}", request.Amount, request.UserId.ToLong());
 
         // Find the user in the database
         var user = await _dbContext.UserGuildXps
-            .FirstOrDefaultAsync(x => x.UserId == request.UserID.ToLong(), cancellationToken);
+            .FirstOrDefaultAsync(x => x.UserId == request.UserId.ToLong(), cancellationToken);
 
         if (user == null)
         {
-            throw new ArgumentNullException(nameof(user));
+            _dbContext.UserGuildXps.Add(new UserGuildXp(
+                request.UserId.ToLong(),
+                request.GuildId.ToLong()));
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            
+            return;
         }
+
 
         // Update the user's experience and level
         user = await UpdateExperienceAndLevel(user, request.ChannelId, request.Amount);
@@ -69,7 +75,7 @@ public sealed class GrantExperienceAmountToUserHandler
         var (newExperience, newLevel) = CalculateExperienceAndLevel(user.XpAmount, user.Level, experience);
 
         await NotifyUserIfLevelUpAsync(user, channelId, newLevel);
-        
+
         // Update the user's experience and level
         user.XpAmount = newExperience;
         user.XpNeededToLevelUp = CalculateExperienceNeeded(newExperience, newLevel);
@@ -80,10 +86,7 @@ public sealed class GrantExperienceAmountToUserHandler
 
     private async Task<Result> NotifyUserIfLevelUpAsync(UserGuildXp user, Snowflake channelId, long newLevel)
     {
-        if (user.Level == newLevel)
-        {
-            return Result.FromSuccess();
-        }
+        if (user.Level == newLevel) return Result.FromSuccess();
 
         var member = await _discordRestUserApi.GetUserAsync(user.UserId.ToSnowflake());
 
