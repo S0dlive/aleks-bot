@@ -52,7 +52,7 @@ public class WelcomerConfigurationCommandGroup
 
         await _mediator.Send(new CreateOrSetWelcomeChannelCommand(guildId.Value, channelId.Value));
 
-        return (Result) await _feedbackService.SendContextualAsync(
+        return (Result) await _feedbackService.SendContextualSuccessAsync(
             $"Welcome channel set to <#{channelId.Value}>",
             options: new FeedbackMessageOptions
             {
@@ -72,7 +72,7 @@ public class WelcomerConfigurationCommandGroup
         guild.WelcomeChannelId = null;
         await _dbContext.SaveChangesAsync();
 
-        return (Result) await _feedbackService.SendContextualAsync(
+        return (Result) await _feedbackService.SendContextualSuccessAsync(
             "Welcomer disabled.",
             options: new FeedbackMessageOptions
             {
