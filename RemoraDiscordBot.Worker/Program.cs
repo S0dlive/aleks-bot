@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RemoraDiscordBot.Core;
 using RemoraDiscordBot.Data;
+using RemoraDiscordBot.Plugins.AdvertisementGuard;
 using RemoraDiscordBot.Plugins.Experience;
 using RemoraDiscordBot.Plugins.Welcomer;
 using RemoraDiscordBot.Worker;
@@ -25,9 +26,10 @@ var host = Host.CreateDefaultBuilder(args)
             })
             .AddDiscordBot(hostContext.Configuration)
             .AddMediatR(AppDomain.CurrentDomain.GetAssemblies())
-            
             .AddExperiencePlugin()
-            .AddWelcomerPlugin();
+            .AddWelcomerPlugin()
+            .AddAdvertisementGuardPlugin()
+            ;
     })
     .ConfigureLogging(
         c => c
