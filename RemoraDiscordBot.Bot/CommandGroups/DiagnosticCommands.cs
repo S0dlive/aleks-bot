@@ -42,7 +42,7 @@ public sealed class DiagnosticCommands
     
     {
         //TODO: Refactor to service
-        var response = await _httpClient.GetAsync("http://localhost:5106/api/v1/Egg?Cracks=3&Type=Cat");
+        var response = await _httpClient.GetAsync(":5106/api/v1/Egg?Cracks=3&Type=Cat");
         
         if (!response.IsSuccessStatusCode)
         {
