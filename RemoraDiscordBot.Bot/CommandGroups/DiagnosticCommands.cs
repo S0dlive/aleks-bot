@@ -52,7 +52,7 @@ public sealed class DiagnosticCommands
 
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogError("Failed to get the egg from the API");
+            _logger.LogError("Failed to get the egg from the API with error code {StatusCode} and error {ErrorMessage}", response.StatusCode,response.ReasonPhrase);
             return Result.FromSuccess();
         }
 
