@@ -18,7 +18,6 @@ public class UserMessageAdvertisementGuardResponder
         @"(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/.+[a-z]";
 
     private readonly IDiscordRestChannelAPI _channelApi;
-
     private readonly FeedbackService _feedbackService;
 
     public UserMessageAdvertisementGuardResponder(
@@ -31,25 +30,20 @@ public class UserMessageAdvertisementGuardResponder
 
     public async Task<Result> RespondAsync(IMessageCreate gatewayEvent, CancellationToken ct = default)
     {
-        if (gatewayEvent.Author.IsBot is { HasValue: true, Value: true })
-        {
-            return Result.FromSuccess();
-        }
+        if (gatewayEvent.Author.IsBot is {HasValue: true, Value: true}) return Result.FromSuccess();
 
         var message = gatewayEvent.Content;
         if (string.IsNullOrWhiteSpace(message)) return Result.FromSuccess();
 
         var match = Regex.Match(message, DISCORD_INVITE_REGEX, RegexOptions.IgnoreCase);
-        if (!match.Success)
-        {
-            return Result.FromSuccess();
-        }
+        if (!match.Success) return Result.FromSuccess();
 
         var user = gatewayEvent.Author;
 
         await _channelApi.DeleteMessageAsync(gatewayEvent.ChannelID, gatewayEvent.ID, ct: ct);
 
-        return (Result) await _feedbackService.SendContextualErrorAsync(
+        return (Result) await _feedbackService.SendErrorAsync(
+            gatewayEvent.ChannelID,
             "Oops... Il semblerait que votre message contenait une potentielle invitation. Erreur ? Contactez un administrateur.",
             user.ID,
             ct: ct);
