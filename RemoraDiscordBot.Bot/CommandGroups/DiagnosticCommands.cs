@@ -4,6 +4,7 @@
 
 using System.ComponentModel;
 using System.Drawing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using Remora.Commands.Attributes;
@@ -20,6 +21,7 @@ namespace RemoraDiscordBot.Core.Commands;
 public sealed class DiagnosticCommands
     : CommandGroup
 {
+    private readonly IConfiguration _configuration;
     private readonly FeedbackService _feedbackService;
     private readonly HttpClient _httpClient;
     private readonly ILogger<DiagnosticCommands> _logger;
@@ -27,11 +29,13 @@ public sealed class DiagnosticCommands
     public DiagnosticCommands(
         FeedbackService feedbackService,
         HttpClient httpClient,
-        ILogger<DiagnosticCommands> logger)
+        ILogger<DiagnosticCommands> logger,
+        IConfiguration configuration)
     {
         _feedbackService = feedbackService;
         _httpClient = httpClient;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [Command("hello")]
@@ -39,11 +43,13 @@ public sealed class DiagnosticCommands
     public async Task<IResult> HelloCommand(
         [Description("The following message that the bot will send")]
         string message)
-    
+
     {
         //TODO: Refactor to service
-        var response = await _httpClient.GetAsync("http://localhost:5106/api/v1/Egg?Cracks=3&Type=Cat");
-        
+        var baseAddress = _configuration["Api:BaseUrl"] ?? throw new ArgumentNullException("Api:BaseUrl");
+
+        var response = await _httpClient.GetAsync($"http://{baseAddress}:5106/api/v1/Egg?Cracks=3&Type=Cat");
+
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogError("Failed to get the egg from the API");
