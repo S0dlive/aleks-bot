@@ -49,9 +49,9 @@ public class UserMessageAdvertisementGuardResponder
 
         await _channelApi.DeleteMessageAsync(gatewayEvent.ChannelID, gatewayEvent.ID, ct: ct);
 
-        return (Result) await _feedbackService.SendPrivateErrorAsync(
-            user.ID,
+        return (Result) await _feedbackService.SendContextualErrorAsync(
             "Oops... Il semblerait que votre message contenait une potentielle invitation. Erreur ? Contactez un administrateur.",
+            user.ID,
             ct: ct);
     }
 }
