@@ -6,11 +6,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Remora.Discord.API.Abstractions.Gateway.Commands;
 using Remora.Discord.Commands.Extensions;
+using Remora.Discord.Commands.Responders;
 using Remora.Discord.Gateway;
 using Remora.Discord.Gateway.Extensions;
+using Remora.Discord.Interactivity;
 using RemoraDiscordBot.Business;
 using RemoraDiscordBot.Core.CommandGroups;
-using RemoraDiscordBot.Core.Commands;
 using RemoraDiscordBot.Core.Exceptions;
 using RemoraDiscordBot.Core.Infrastructure;
 using RemoraDiscordBot.Core.Responders.AnyResponderLogging;
@@ -33,14 +34,15 @@ public static class Setup
                 .Configure<DiscordGatewayClientOptions>(options =>
                 {
                     options.Intents = GatewayIntents.MessageContents
-                                                   | GatewayIntents.GuildMessages
-                                                   | GatewayIntents.Guilds
-                                                   | GatewayIntents.GuildMembers
-                                                   | GatewayIntents.GuildMessageReactions
-                                                   | GatewayIntents.GuildMessageTyping
-                                                   | GatewayIntents.Guilds
-                                                   | GatewayIntents.GuildVoiceStates;
+                                      | GatewayIntents.GuildMessages
+                                      | GatewayIntents.Guilds
+                                      | GatewayIntents.GuildMembers
+                                      | GatewayIntents.GuildMessageReactions
+                                      | GatewayIntents.GuildMessageTyping
+                                      | GatewayIntents.Guilds
+                                      | GatewayIntents.GuildVoiceStates;
                 })
+                .Configure<InteractionResponderOptions>(options => options.SuppressAutomaticResponses = true)
                 .AddDiscordCommands(true)
                 .AddDiscordBotCoreCommands()
                 .AddExperiencePlugin()
