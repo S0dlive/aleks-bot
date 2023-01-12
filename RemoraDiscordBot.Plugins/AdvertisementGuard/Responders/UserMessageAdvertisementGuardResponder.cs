@@ -4,7 +4,9 @@
 
 using System.Text.RegularExpressions;
 using Remora.Discord.API.Abstractions.Gateway.Events;
+using Remora.Discord.API.Abstractions.Objects;
 using Remora.Discord.API.Abstractions.Rest;
+using Remora.Discord.Commands.Feedback.Messages;
 using Remora.Discord.Commands.Feedback.Services;
 using Remora.Discord.Gateway.Responders;
 using Remora.Results;
@@ -32,6 +34,9 @@ public class UserMessageAdvertisementGuardResponder
     {
         if (gatewayEvent.Author.IsBot is {HasValue: true, Value: true}) return Result.FromSuccess();
 
+        if (gatewayEvent.Member.Value.Permissions.Value.HasPermission(DiscordPermission.ManageMessages))
+            return Result.FromSuccess();
+
         var message = gatewayEvent.Content;
         if (string.IsNullOrWhiteSpace(message)) return Result.FromSuccess();
 
@@ -46,6 +51,10 @@ public class UserMessageAdvertisementGuardResponder
             gatewayEvent.ChannelID,
             "Oops... Il semblerait que votre message contenait une potentielle invitation. Erreur ? Contactez un administrateur.",
             user.ID,
-            ct: ct);
+            new FeedbackMessageOptions
+            {
+                MessageFlags = MessageFlags.Urgent | MessageFlags.Ephemeral
+            },
+            ct);
     }
 }
