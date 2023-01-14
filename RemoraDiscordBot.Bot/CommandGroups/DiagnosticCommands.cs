@@ -46,7 +46,8 @@ public sealed class DiagnosticCommands
 
     {
         //TODO: Refactor to service
-        var baseAddress = _configuration["Api:BaseUrl"] ?? throw new ArgumentNullException("Api:BaseUrl");
+        var baseAddress = _configuration["Api:BaseUrl"] 
+                          ?? throw new ArgumentNullException("Api:BaseUrl");
 
         var response = await _httpClient.GetAsync($"http://{baseAddress}:5106/api/v1/Egg?Cracks=3&Type=Cat");
 

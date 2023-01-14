@@ -108,16 +108,7 @@ public class ExperienceCommandGroup
 
         var instigatorUser = await _userApi.GetUserAsync(instigatorId.Value, CancellationToken);
 
-        var baseAddress = _configuration["Api:BaseUrl"] ?? throw new ArgumentNullException("Api:BaseUrl");
-
-        var response = await _httpClient.GetAsync($"http://{baseAddress}:5106/api/v1/Creature?Age=3&Type=Cat");
-
-        if (!response.IsSuccessStatusCode)
-            return Result.FromError(new NoBotError("Failed to get the egg from the API"));
-
-        var content = await response.Content.ReadAsStreamAsync();
-
-        var fileData = new FileData("egg.png", content, "image/png");
+        var data = await _mediator.Send(new GetCreatureOrEggByUserQuery(instigatorId.Value, instigatorGuildId.Value));
 
 
         return (Result) await _feedbackService.SendContextualEmbedAsync(
@@ -125,7 +116,7 @@ public class ExperienceCommandGroup
             {
                 Title = $"Profile for {user?.Username ?? instigatorUser.Entity.Username}",
                 Colour = DiscordTransparentColor.Value,
-                Image = new EmbedImage("attachment://egg.png"),
+                Image = new EmbedImage("attachment://file.png"),
                 Fields = new List<EmbedField>
                 {
                     new("Level", level.ToString(), true),
@@ -137,7 +128,7 @@ public class ExperienceCommandGroup
             {
                 Attachments = new[]
                 {
-                    OneOf<FileData, IPartialAttachment>.FromT0(fileData)
+                    OneOf<FileData, IPartialAttachment>.FromT0(data)
                 }
             },
             CancellationToken);
