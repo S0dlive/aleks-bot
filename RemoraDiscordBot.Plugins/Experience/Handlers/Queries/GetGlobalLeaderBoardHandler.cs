@@ -5,7 +5,7 @@
 using System.Collections.ObjectModel;
 using MediatR;
 using RemoraDiscordBot.Data;
-using RemoraDiscordBot.Data.Domain.Xp;
+using RemoraDiscordBot.Data.Domain.Experience;
 using RemoraDiscordBot.Plugins.Experience.Queries;
 
 namespace RemoraDiscordBot.Plugins.Experience.Handlers;

@@ -4,7 +4,7 @@
 
 using System.Collections.ObjectModel;
 using MediatR;
-using RemoraDiscordBot.Data.Domain.Xp;
+using RemoraDiscordBot.Data.Domain.Experience;
 
 namespace RemoraDiscordBot.Plugins.Experience.Queries;
 

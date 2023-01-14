@@ -4,16 +4,10 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace RemoraDiscordBot.Data.Domain.Xp;
+namespace RemoraDiscordBot.Data.Domain.Experience;
 
 public class UserGuildXp
 {
-    private readonly IEnumerable<string> _allCreatureTypes = new[]
-    {
-        "Snake",
-        "Cat"
-    };
-
     public UserGuildXp(long userId, long guildId)
     {
         UserId = userId;
@@ -21,7 +15,6 @@ public class UserGuildXp
         XpAmount = 0;
         Level = 0;
         XpNeededToLevelUp = CalculateExperienceNeeded(XpAmount, Level);
-        AssociatedCreature = RandomCreature();
     }
 
     [Key] public long UserId { get; set; }
@@ -36,10 +29,8 @@ public class UserGuildXp
 
     public string AssociatedCreature { get; set; }
 
-    private string RandomCreature()
-    {
-        return _allCreatureTypes.OrderBy(x => Guid.NewGuid()).First();
-    }
+    public UserGuildCreature Creature { get; set; }
+
 
     private static int CalculateExperienceNeeded(long xp, long level)
     {

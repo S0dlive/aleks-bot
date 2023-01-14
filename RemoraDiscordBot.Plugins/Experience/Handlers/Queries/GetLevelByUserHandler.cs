@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Data;
-using RemoraDiscordBot.Data.Domain.Xp;
+using RemoraDiscordBot.Data.Domain.Experience;
 using RemoraDiscordBot.Plugins.Experience.Queries;
 
 namespace RemoraDiscordBot.Plugins.Experience.Handlers;

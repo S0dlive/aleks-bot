@@ -3,8 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.EntityFrameworkCore;
+using RemoraDiscordBot.Data.Domain.Experience;
 using RemoraDiscordBot.Data.Domain.Welcomer;
-using RemoraDiscordBot.Data.Domain.Xp;
 
 namespace RemoraDiscordBot.Data;
 
@@ -21,9 +21,14 @@ public class RemoraDiscordBotDbContext
 
     public DbSet<WelcomerGuild> WelcomerGuilds { get; set; } = null!;
 
+    public DbSet<UserGuildCreature> UserGuildCreatures { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserGuildXp>()
             .HasKey(x => new {x.UserId, x.GuildId});
+
+        modelBuilder.Entity<UserGuildXp>()
+            .HasOne(u => u.Creature);
     }
 }

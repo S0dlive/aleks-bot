@@ -6,7 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Data;
-using RemoraDiscordBot.Data.Domain.Xp;
+using RemoraDiscordBot.Data.Domain.Experience;
 using RemoraDiscordBot.Plugins.Experience.Queries;
 
 namespace RemoraDiscordBot.Plugins.Experience.Handlers;
@@ -14,7 +14,7 @@ namespace RemoraDiscordBot.Plugins.Experience.Handlers;
 public sealed record GetUserBySnowflakeHandler(RemoraDiscordBotDbContext DbContext)
     : IRequestHandler<GetUserBySnowflakeQuery, UserGuildXp?>
 {
-    public async Task<Data.Domain.Xp.UserGuildXp?> Handle(GetUserBySnowflakeQuery request, CancellationToken cancellationToken)
+    public async Task<UserGuildXp?> Handle(GetUserBySnowflakeQuery request, CancellationToken cancellationToken)
     {
         var user = await DbContext.UserGuildXps.FirstOrDefaultAsync(x => x.UserId == request.UserSnowflake.ToLong(), cancellationToken);
 
