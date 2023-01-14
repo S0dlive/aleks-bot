@@ -29,6 +29,11 @@ public class RemoraDiscordBotDbContext
             .HasKey(x => new {x.UserId, x.GuildId});
 
         modelBuilder.Entity<UserGuildXp>()
-            .HasOne(u => u.Creature);
+            .HasOne(u => u.Creature)
+            .WithOne(c => c.Possessor)
+            .HasForeignKey<UserGuildCreature>(c => new {c.PossessorId, c.PossessorGuildId});
+
+        modelBuilder.Entity<UserGuildCreature>()
+            .HasKey(c => c.Id);
     }
 }

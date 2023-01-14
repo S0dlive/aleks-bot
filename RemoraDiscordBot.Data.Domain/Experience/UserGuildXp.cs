@@ -15,6 +15,7 @@ public class UserGuildXp
         XpAmount = 0;
         Level = 0;
         XpNeededToLevelUp = CalculateExperienceNeeded(XpAmount, Level);
+        Creature = new UserGuildCreature();
     }
 
     [Key] public long UserId { get; set; }
@@ -27,8 +28,7 @@ public class UserGuildXp
 
     public long XpNeededToLevelUp { get; set; }
 
-    public string AssociatedCreature { get; set; }
-
+    public int CreatureId { get; set; }
     public UserGuildCreature Creature { get; set; }
 
 

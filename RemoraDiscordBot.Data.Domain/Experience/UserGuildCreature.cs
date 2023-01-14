@@ -26,6 +26,9 @@ public class UserGuildCreature
     public bool IsEgg { get; set; } = true;
 
     public int Level { get; set; } = 1;
+    public long PossessorId { get; set; }
+    public long PossessorGuildId { get; set; }
+    public UserGuildXp Possessor { get; set; }
 
     private string GetCreatureType()
     {
