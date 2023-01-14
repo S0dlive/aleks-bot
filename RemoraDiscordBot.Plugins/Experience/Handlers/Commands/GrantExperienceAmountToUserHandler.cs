@@ -45,10 +45,14 @@ public sealed class GrantExperienceAmountToUserHandler
 
         // Find the user in the database
         var user = await _dbContext.UserGuildXps
-            .FirstOrDefaultAsync(x => x.UserId == request.UserId.ToLong() && x.GuildId == request.GuildId.ToLong(), cancellationToken);
+            .Include(x => x.Creature)
+            .FirstOrDefaultAsync(x => x.UserId == request.UserId.ToLong() && x.GuildId == request.GuildId.ToLong(),
+                cancellationToken);
 
         if (user == null)
         {
+            _logger.LogInformation("User {User} not found in database, creating a new one", request.UserId.ToLong());
+            
             _dbContext.UserGuildXps.Add(new UserGuildXp(
                 request.UserId.ToLong(),
                 request.GuildId.ToLong()));
@@ -74,12 +78,16 @@ public sealed class GrantExperienceAmountToUserHandler
         // Calculate the new experience and level
         var (newExperience, newLevel) = CalculateExperienceAndLevel(user.XpAmount, user.Level, experience);
 
+        _logger.LogInformation("User {User} has {Experience} experience and is level {Level}", user.UserId, newExperience, newLevel);
+        
         await NotifyUserIfLevelUpAsync(user, channelId, newLevel);
 
         // Update the user's experience and level
         user.XpAmount = newExperience;
         user.XpNeededToLevelUp = CalculateExperienceNeeded(newExperience, newLevel);
         user.Level = newLevel;
+        
+        _logger.LogInformation("User {User} has been updated to {Experience} experience and is level {Level}", user.UserId, newExperience, newLevel);
 
         return user;
     }
@@ -92,14 +100,20 @@ public sealed class GrantExperienceAmountToUserHandler
 
         if (newLevel % 5 == 0)
         {
+            _logger.LogInformation("User {User} has leveled up to level {Level}", user.UserId, newLevel);
+            
             if (user.Creature is {IsEgg: true, Level: 5})
             {
                 user.Creature.IsEgg = false;
                 user.Creature.Level = 1;
+                
+                _logger.LogInformation("User {User} has hatched their creature to level {Creature}!", user.UserId, user.Creature.Level);
             }
             else
             {
                 user.Creature.Level++;
+                
+                _logger.LogInformation("User {User} has leveled up their creature to level {Level}!", user.UserId, user.Creature.Level);
             }
 
             return (Result) await _feedbackService.SendContentAsync(
