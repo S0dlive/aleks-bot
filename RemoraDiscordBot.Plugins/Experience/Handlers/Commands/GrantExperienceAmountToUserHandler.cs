@@ -45,7 +45,7 @@ public sealed class GrantExperienceAmountToUserHandler
 
         // Find the user in the database
         var user = await _dbContext.UserGuildXps
-            .FirstOrDefaultAsync(x => x.UserId == request.UserId.ToLong(), cancellationToken);
+            .FirstOrDefaultAsync(x => x.UserId == request.UserId.ToLong() && x.GuildId == request.GuildId.ToLong(), cancellationToken);
 
         if (user == null)
         {
