@@ -35,11 +35,12 @@ public sealed record GetCreatureOrEggByUserHandler(
         var baseAddress = Configuration["Api:BaseUrl"]
                           ?? throw new InvalidOperationException("Api:BaseUrl is not set in configuration");
 
-
+        var level = userGuildXp.Creature.Level >= 5 ? 5 : userGuildXp.Creature.Level;
+        
         var url = userGuildXp.Creature.IsEgg switch
         {
-            true => $"http://{baseAddress}:5106/api/v1/Egg?Type={userGuildXp.Creature.CreatureType}&Cracks={userGuildXp.Creature.Level}",
-            false => $"http://{baseAddress}:5106/api/v1/Creature?Type={userGuildXp.Creature.CreatureType}&Age={userGuildXp.Creature.Level}"
+            true => $"http://{baseAddress}:5106/api/v1/Egg?Type={userGuildXp.Creature.CreatureType}&Cracks={level}",
+            false => $"http://{baseAddress}:5106/api/v1/Creature?Type={userGuildXp.Creature.CreatureType}&Age={level}"
         };
 
         Logger.LogInformation("Calling {Url}", url);

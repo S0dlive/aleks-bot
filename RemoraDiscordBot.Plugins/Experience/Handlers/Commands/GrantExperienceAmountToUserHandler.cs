@@ -54,7 +54,7 @@ public sealed class GrantExperienceAmountToUserHandler
                 request.GuildId.ToLong()));
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-            
+
             return;
         }
 
@@ -90,9 +90,28 @@ public sealed class GrantExperienceAmountToUserHandler
 
         var member = await _discordRestUserApi.GetUserAsync(user.UserId.ToSnowflake());
 
+        if (newLevel % 5 == 0)
+        {
+            if (user.Creature is {IsEgg: true, Level: 5})
+            {
+                user.Creature.IsEgg = false;
+                user.Creature.Level = 1;
+            }
+            else
+            {
+                user.Creature.Level++;
+            }
+
+            return (Result) await _feedbackService.SendContentAsync(
+                channelId,
+                $"Félicitations **{member.Entity.Username}**! Tu as atteint le niveau {newLevel}!\n*Et quelque chose d'autre semble avoir bougé...*",
+                Color.Aqua);
+        }
+
+
         return (Result) await _feedbackService.SendContentAsync(
             channelId,
-            $"Congratulations **{member.Entity.Username}**! You have reached level {newLevel}!",
+            $"Félicitations **{member.Entity.Username}**! Tu as atteint le niveau {newLevel}!",
             Color.Aqua);
     }
 
