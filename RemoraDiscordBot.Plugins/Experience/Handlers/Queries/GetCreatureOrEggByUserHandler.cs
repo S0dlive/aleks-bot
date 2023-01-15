@@ -36,6 +36,14 @@ public sealed record GetCreatureOrEggByUserHandler(
                           ?? throw new InvalidOperationException("Api:BaseUrl is not set in configuration");
 
         var level = userGuildXp.Creature.Level >= 5 ? 5 : userGuildXp.Creature.Level;
+
+        if (userGuildXp.Creature is {IsEgg: true, Level: >= 4})
+        {
+            userGuildXp.Creature.Level = 1;
+            userGuildXp.Creature.IsEgg = false;
+            
+            await DbContext.SaveChangesAsync(cancellationToken);
+        }
         
         var url = userGuildXp.Creature.IsEgg switch
         {
