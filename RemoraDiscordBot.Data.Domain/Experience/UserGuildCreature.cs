@@ -11,7 +11,8 @@ public class UserGuildCreature
     private readonly IEnumerable<string> _allCreatureTypes = new[]
     {
         "Snake",
-        "Cat"
+        "Cat",
+        "Cow"
     };
 
     public UserGuildCreature()
