@@ -42,7 +42,6 @@ public static class Setup
                                       | GatewayIntents.Guilds
                                       | GatewayIntents.GuildVoiceStates;
                 })
-                .Configure<InteractionResponderOptions>(options => options.SuppressAutomaticResponses = true)
                 .AddDiscordCommands(true)
                 .AddDiscordBotCoreCommands()
                 .AddExperiencePlugin()

@@ -48,6 +48,8 @@ public sealed class GrantExperienceAmountToUserHandler
             .Include(x => x.Creature)
             .FirstOrDefaultAsync(x => x.UserId == request.UserId.ToLong() && x.GuildId == request.GuildId.ToLong(),
                 cancellationToken);
+        
+        _logger.LogInformation("Found user {User} with {Amount} experience", user?.UserId, user?.XpAmount);
 
         if (user == null)
         {
