@@ -4,8 +4,6 @@
 
 using System.ComponentModel;
 using MediatR;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using OneOf;
 using Remora.Commands.Attributes;
 using Remora.Commands.Groups;
@@ -32,9 +30,7 @@ public class ExperienceCommandGroup
     : CommandGroup
 {
     private readonly ICommandContext _commandContext;
-    private readonly IConfiguration _configuration;
     private readonly FeedbackService _feedbackService;
-    private readonly HttpClient _httpClient;
     private readonly IMediator _mediator;
     private readonly IDiscordRestUserAPI _userApi;
 
@@ -42,16 +38,12 @@ public class ExperienceCommandGroup
         ICommandContext commandContext,
         IMediator mediator,
         IDiscordRestUserAPI userApi,
-        FeedbackService feedbackService,
-        HttpClient httpClient,
-        IConfiguration configuration)
+        FeedbackService feedbackService)
     {
         _commandContext = commandContext;
         _mediator = mediator;
         _userApi = userApi;
         _feedbackService = feedbackService;
-        _httpClient = httpClient;
-        _configuration = configuration;
     }
 
     [Command("amount")]
@@ -149,7 +141,6 @@ public class ExperienceCommandGroup
             IMediator mediator,
             IDiscordRestUserAPI userApi,
             FeedbackService feedbackService,
-            ILogger<ExperienceCommandGroup> logger,
             IDiscordRestGuildAPI guildApi)
         {
             _commandContext = commandContext;
