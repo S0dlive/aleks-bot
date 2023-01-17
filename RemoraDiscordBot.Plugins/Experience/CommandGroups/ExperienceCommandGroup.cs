@@ -108,7 +108,7 @@ public class ExperienceCommandGroup
 
         var instigatorUser = await _userApi.GetUserAsync(instigatorId.Value, CancellationToken);
 
-        var data = await _mediator.Send(new GetCreatureOrEggByUserQuery(instigatorId.Value, instigatorGuildId.Value));
+        var data = await _mediator.Send(new GetCreatureOrEggByUserQuery(userToCheck.Value, instigatorGuildId.Value));
 
 
         return (Result) await _feedbackService.SendContextualEmbedAsync(
