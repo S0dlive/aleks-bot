@@ -22,6 +22,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="AutoRoles\Commands" />
+      <Folder Include="AutoRoles\Handlers" />
+      <Folder Include="AutoRoles\Queries" />
       <Folder Include="AutoRoles\Responders" />
     </ItemGroup>
 

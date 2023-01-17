@@ -24,6 +24,9 @@ public class RemoraDiscordBotDbContext
 
     public DbSet<UserGuildCreature> UserGuildCreatures { get; set; } = null!;
 
+    public DbSet<AutoRoleChannel> AutoRoleChannels { get; set; } = null!;
+    public DbSet<AutoRoleReaction> AutoRoleReactions { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         var userGuildXp = modelBuilder.Entity<UserGuildXp>();
