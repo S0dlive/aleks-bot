@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.EntityFrameworkCore;
+using RemoraDiscordBot.Data.Domain.AutoRoles;
 using RemoraDiscordBot.Data.Domain.Experience;
 using RemoraDiscordBot.Data.Domain.Welcomer;
 
@@ -25,15 +26,29 @@ public class RemoraDiscordBotDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<UserGuildXp>()
+        var userGuildXp = modelBuilder.Entity<UserGuildXp>();
+        var autoRole = modelBuilder.Entity<AutoRoleChannel>();
+
+        userGuildXp
             .HasKey(x => new {x.UserId, x.GuildId});
 
-        modelBuilder.Entity<UserGuildXp>()
+        userGuildXp
             .HasOne(u => u.Creature)
             .WithOne(c => c.Possessor)
             .HasForeignKey<UserGuildCreature>(c => new {c.PossessorId, c.PossessorGuildId});
 
         modelBuilder.Entity<UserGuildCreature>()
             .HasKey(c => c.Id);
+
+        autoRole
+            .HasKey(x => new {x.MessageId, x.GuildId});
+
+        modelBuilder.Entity<AutoRoleReaction>()
+            .HasKey(x => x.Id);
+
+        autoRole
+            .HasMany(x => x.Reactions)
+            .WithOne(x => x.AutoRoleChannel)
+            .HasForeignKey(x => new {x.InstigatorMessageId, x.InstigatorGuildId});
     }
 }
