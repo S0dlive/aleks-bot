@@ -8,12 +8,15 @@ public class AutoRoleChannel
 {
     public AutoRoleChannel(
         long messageId,
+        long channelId,
         long guildId)
     {
+        ChannelId = channelId;
         MessageId = messageId;
         GuildId = guildId;
     }
 
+    public long ChannelId { get; set; }
     public long MessageId { get; set; }
     public long GuildId { get; set; }
     public IEnumerable<AutoRoleReaction> Reactions { get; set; } = new List<AutoRoleReaction>();

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using RemoraDiscordBot.Core;
 using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.AdvertisementGuard;
+using RemoraDiscordBot.Plugins.AutoRoles;
 using RemoraDiscordBot.Plugins.Experience;
 using RemoraDiscordBot.Plugins.Welcomer;
 using RemoraDiscordBot.Worker;
@@ -29,6 +30,7 @@ var host = Host.CreateDefaultBuilder(args)
             .AddExperiencePlugin()
             .AddWelcomerPlugin()
             .AddAdvertisementGuardPlugin()
+            .AddAutoRolesPlugin()
             ;
     })
     .ConfigureLogging(

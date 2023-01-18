@@ -6,6 +6,9 @@ using System.ComponentModel;
 using MediatR;
 using Remora.Commands.Attributes;
 using Remora.Discord.API.Abstractions.Objects;
+using Remora.Discord.API.Abstractions.Rest;
+using Remora.Discord.Commands.Contexts;
+using Remora.Discord.Commands.Feedback.Services;
 using Remora.Rest.Core;
 using Remora.Results;
 
@@ -15,10 +18,6 @@ namespace RemoraDiscordBot.Plugins.AutoRoles.CommandGroups;
 public class AutoRoleReactionCommandGroup
     : AutoRoleCommandGroup
 {
-    public AutoRoleReactionCommandGroup(IMediator mediator)
-        : base(mediator)
-    {
-    }
 
     [Command("add")]
     [Description("Add a reaction to an auto-role message.")]
@@ -33,6 +32,11 @@ public class AutoRoleReactionCommandGroup
         [Description("The label to add to the reaction.")]
         string label
     )
+    {
+        return Result.FromSuccess();
+    }
+
+    public AutoRoleReactionCommandGroup(IMediator mediator, IDiscordRestChannelAPI channelApi, ICommandContext context, FeedbackService feedbackService) : base(mediator, channelApi, context, feedbackService)
     {
     }
 }

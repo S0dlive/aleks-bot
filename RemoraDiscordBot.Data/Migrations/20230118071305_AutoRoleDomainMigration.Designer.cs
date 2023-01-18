@@ -11,7 +11,7 @@ using RemoraDiscordBot.Data;
 namespace RemoraDiscordBot.Data.Migrations
 {
     [DbContext(typeof(RemoraDiscordBotDbContext))]
-    [Migration("20230117132740_AutoRoleDomainMigration")]
+    [Migration("20230118071305_AutoRoleDomainMigration")]
     partial class AutoRoleDomainMigration
     {
         /// <inheritdoc />
@@ -30,9 +30,12 @@ namespace RemoraDiscordBot.Data.Migrations
                     b.Property<long>("GuildId")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("ChannelId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("MessageId", "GuildId");
 
-                    b.ToTable("AutoRoleChannel");
+                    b.ToTable("AutoRoleChannels");
                 });
 
             modelBuilder.Entity("RemoraDiscordBot.Data.Domain.AutoRoles.AutoRoleReaction", b =>
@@ -62,7 +65,7 @@ namespace RemoraDiscordBot.Data.Migrations
 
                     b.HasIndex("InstigatorMessageId", "InstigatorGuildId");
 
-                    b.ToTable("AutoRoleReaction");
+                    b.ToTable("AutoRoleReactions");
                 });
 
             modelBuilder.Entity("RemoraDiscordBot.Data.Domain.Experience.UserGuildCreature", b =>
