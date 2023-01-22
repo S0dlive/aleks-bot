@@ -11,8 +11,8 @@ using RemoraDiscordBot.Data;
 namespace RemoraDiscordBot.Data.Migrations
 {
     [DbContext(typeof(RemoraDiscordBotDbContext))]
-    [Migration("20230118071305_AutoRoleDomainMigration")]
-    partial class AutoRoleDomainMigration
+    [Migration("20230118133728_AutoRoleUpdate")]
+    partial class AutoRoleUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

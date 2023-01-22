@@ -10,6 +10,7 @@ using Remora.Discord.Commands.Responders;
 using Remora.Discord.Gateway;
 using Remora.Discord.Gateway.Extensions;
 using Remora.Discord.Interactivity;
+using Remora.Discord.Interactivity.Extensions;
 using RemoraDiscordBot.Business;
 using RemoraDiscordBot.Core.CommandGroups;
 using RemoraDiscordBot.Core.Exceptions;
@@ -42,6 +43,8 @@ public static class Setup
                                       | GatewayIntents.Guilds
                                       | GatewayIntents.GuildVoiceStates;
                 })
+                .AddInteractivity()
+                
                 .AddDiscordCommands(true)
                 .AddDiscordBotCoreCommands()
                 .AddExperiencePlugin()

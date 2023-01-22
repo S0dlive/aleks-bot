@@ -2,11 +2,16 @@
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Immutable;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Remora.Discord.API.Abstractions.Objects;
 using Remora.Discord.API.Abstractions.Rest;
 using Remora.Discord.API.Objects;
+using Remora.Discord.Commands.Attributes;
+using Remora.Discord.Commands.Feedback.Messages;
+using Remora.Discord.Commands.Feedback.Services;
 using RemoraDiscordBot.Business.Colors;
 using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Data;
@@ -21,15 +26,18 @@ public sealed class CreateAutoRoleHandler
     private readonly IDiscordRestChannelAPI _channelApi;
     private readonly RemoraDiscordBotDbContext _dbContext;
     private readonly ILogger<CreateAutoRoleHandler> _logger;
+    private readonly FeedbackService _feedbackService;
 
     public CreateAutoRoleHandler(
         RemoraDiscordBotDbContext dbContext,
         ILogger<CreateAutoRoleHandler> logger,
-        IDiscordRestChannelAPI channelApi)
+        IDiscordRestChannelAPI channelApi, 
+        FeedbackService feedbackService)
     {
         _dbContext = dbContext;
         _logger = logger;
         _channelApi = channelApi;
+        _feedbackService = feedbackService;
     }
 
     public async Task<bool> Handle(CreateAutoRoleCommand request, CancellationToken cancellationToken)
@@ -43,17 +51,55 @@ public sealed class CreateAutoRoleHandler
         {
             _logger.LogWarning("AutoRoleChannel already created for guild {GuildId} and channel {ChannelId}",
                 request.GuildId, request.ChannelId);
+
+            await _feedbackService.SendContextualErrorAsync(
+                "AutoRoleChannel already created for this channel.",
+                options: new FeedbackMessageOptions
+                {
+                    MessageFlags = MessageFlags.Ephemeral
+                },
+                ct: cancellationToken); 
+
             return false;
         }
 
-        var embed = new Embed(Description: request.Message, Colour: DiscordTransparentColor.Value);
+        var embed = new Embed("Test", Description: request.Message, Colour: DiscordTransparentColor.Value);
+
+        var selectMenu = new StringSelectComponent(
+            "test",
+            ImmutableArray<ISelectOption>.Empty,
+            "Select an option",
+            1,
+            1);
+
         var message =
-            await _channelApi.CreateMessageAsync(request.ChannelId, embeds: new[] {embed}, ct: cancellationToken);
+            await _channelApi.CreateMessageAsync(
+                request.ChannelId,
+                embeds: new[] {embed},
+                components: new[]
+                {
+                    new ActionRowComponent(new[]
+                    {
+                        selectMenu
+                    })
+                },
+                ct: cancellationToken);
+
+        if (!message.IsSuccess)
+        {
+            _logger.LogError(
+                "Failed to create message for AutoRoleChannel for guild {GuildId} and channel {ChannelId} with Error {Error}",
+                request.GuildId,
+                request.ChannelId,
+                message.Inner?.Error?.Message);
+
+            return false;
+        }
 
         var autoRoleChannel = new AutoRoleChannel(message.Entity.ID.ToLong(), request.ChannelId.ToLong(),
             request.GuildId.ToLong());
 
-        await _dbContext.AutoRoleChannels.AddAsync(autoRoleChannel, cancellationToken);
+        _dbContext.AutoRoleChannels.Add(autoRoleChannel);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return true;

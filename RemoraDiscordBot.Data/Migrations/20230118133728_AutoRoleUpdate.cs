@@ -6,12 +6,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RemoraDiscordBot.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class CreatureInitialMigration : Migration
+    public partial class AutoRoleUpdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "AutoRoleChannels",
+                columns: table => new
+                {
+                    MessageId = table.Column<long>(type: "bigint", nullable: false),
+                    GuildId = table.Column<long>(type: "bigint", nullable: false),
+                    ChannelId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AutoRoleChannels", x => new { x.MessageId, x.GuildId });
+                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -49,6 +63,32 @@ namespace RemoraDiscordBot.Data.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "AutoRoleReactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Label = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Emoji = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RoleId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    InstigatorMessageId = table.Column<long>(type: "bigint", nullable: false),
+                    InstigatorGuildId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AutoRoleReactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AutoRoleReactions_AutoRoleChannels_InstigatorMessageId_Insti~",
+                        columns: x => new { x.InstigatorMessageId, x.InstigatorGuildId },
+                        principalTable: "AutoRoleChannels",
+                        principalColumns: new[] { "MessageId", "GuildId" },
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "UserGuildCreatures",
                 columns: table => new
                 {
@@ -74,6 +114,11 @@ namespace RemoraDiscordBot.Data.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AutoRoleReactions_InstigatorMessageId_InstigatorGuildId",
+                table: "AutoRoleReactions",
+                columns: new[] { "InstigatorMessageId", "InstigatorGuildId" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserGuildCreatures_PossessorId_PossessorGuildId",
                 table: "UserGuildCreatures",
                 columns: new[] { "PossessorId", "PossessorGuildId" },
@@ -84,10 +129,16 @@ namespace RemoraDiscordBot.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AutoRoleReactions");
+
+            migrationBuilder.DropTable(
                 name: "UserGuildCreatures");
 
             migrationBuilder.DropTable(
                 name: "WelcomerGuilds");
+
+            migrationBuilder.DropTable(
+                name: "AutoRoleChannels");
 
             migrationBuilder.DropTable(
                 name: "UserGuildXps");

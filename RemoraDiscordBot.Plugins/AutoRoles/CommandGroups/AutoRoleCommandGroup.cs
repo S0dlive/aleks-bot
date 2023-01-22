@@ -53,14 +53,15 @@ public class AutoRoleCommandGroup
 
         var targetChannelId = channelId ?? currentChannelId;
 
+        if (targetChannelId is null)
+        {
+            throw new InvalidOperationException("Could not get channel ID.");
+        }
+
         var channelJustCreated =
             await _mediator.Send(new CreateAutoRoleCommand(message, targetChannelId.Value, guildId.Value));
 
-        return channelJustCreated switch
-        {
-            true => (Result) await _feedbackService.SendContextualSuccessAsync("AutoRole message created."),
-            false => (Result) await _feedbackService.SendContextualErrorAsync("AutoRole message already exists.")
-        };
+        return Result.FromSuccess();
     }
 
     [Command("remove")]
