@@ -9,6 +9,7 @@ using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.AdvertisementGuard;
 using RemoraDiscordBot.Plugins.AutoRoles;
 using RemoraDiscordBot.Plugins.Experience;
+using RemoraDiscordBot.Plugins.PersonalVocal;
 using RemoraDiscordBot.Plugins.Welcomer;
 using RemoraDiscordBot.Worker;
 
@@ -31,6 +32,7 @@ var host = Host.CreateDefaultBuilder(args)
             .AddWelcomerPlugin()
             .AddAdvertisementGuardPlugin()
             .AddAutoRolesPlugin()
+            .AddPersonalVocalPlugin()
             ;
     })
     .ConfigureLogging(

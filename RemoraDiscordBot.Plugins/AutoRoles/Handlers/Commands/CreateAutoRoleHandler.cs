@@ -51,7 +51,7 @@ public sealed class CreateAutoRoleHandler
         {
             _logger.LogWarning("AutoRoleChannel already created for guild {GuildId} and channel {ChannelId}",
                 request.GuildId, request.ChannelId);
-
+        
             await _feedbackService.SendContextualErrorAsync(
                 "AutoRoleChannel already created for this channel.",
                 options: new FeedbackMessageOptions
@@ -63,7 +63,7 @@ public sealed class CreateAutoRoleHandler
             return false;
         }
 
-        var embed = new Embed("Test", Description: request.Message, Colour: DiscordTransparentColor.Value);
+        var embed = new Embed(Description: request.Message, Colour: DiscordTransparentColor.Value);
 
         var selectMenu = new StringSelectComponent(
             "test",
