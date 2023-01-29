@@ -25,7 +25,8 @@
       <Folder Include="AutoRoles\Handlers\Queries" />
       <Folder Include="AutoRoles\Queries" />
       <Folder Include="AutoRoles\Responders" />
-      <Folder Include="PersonalVocal\CommandGroups" />
+      <Folder Include="PersonalVocal\Handlers\Queries" />
+      <Folder Include="PersonalVocal\Queries" />
     </ItemGroup>
 
 </Project>
