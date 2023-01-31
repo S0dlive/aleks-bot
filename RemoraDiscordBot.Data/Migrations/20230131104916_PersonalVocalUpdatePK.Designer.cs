@@ -11,8 +11,8 @@ using RemoraDiscordBot.Data;
 namespace RemoraDiscordBot.Data.Migrations
 {
     [DbContext(typeof(RemoraDiscordBotDbContext))]
-    [Migration("20230129101130_PersonalVocalFeatMigration")]
-    partial class PersonalVocalFeatMigration
+    [Migration("20230131104916_PersonalVocalUpdatePK")]
+    partial class PersonalVocalUpdatePK
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -125,15 +125,35 @@ namespace RemoraDiscordBot.Data.Migrations
 
             modelBuilder.Entity("RemoraDiscordBot.Data.Domain.PersonalVocal.PersonalVocal", b =>
                 {
+                    b.Property<long>("GuildId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CategoryId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("ChannelId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("GuildId");
+
+                    b.ToTable("PersonalVocals");
+                });
+
+            modelBuilder.Entity("RemoraDiscordBot.Data.Domain.PersonalVocal.UserPersonalVocal", b =>
+                {
+                    b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("GuildId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("ChannelId", "GuildId");
+                    b.Property<long>("ChannelId")
+                        .HasColumnType("bigint");
 
-                    b.ToTable("PersonalVocals");
+                    b.HasKey("UserId", "GuildId");
+
+                    b.ToTable("UserPersonalVocals");
                 });
 
             modelBuilder.Entity("RemoraDiscordBot.Data.Domain.Welcomer.WelcomerGuild", b =>

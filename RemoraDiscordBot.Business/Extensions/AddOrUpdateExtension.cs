@@ -2,31 +2,33 @@
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace RemoraDiscordBot.Business.Extensions;
 
 public static class AddOrUpdateExtension
 {
-    public static async Task AddOrUpdateAsync<T>(
-        this DbSet<T> dbSet,
-        T entity,
-        Expression<Func<T, bool>> predicate,
-        CancellationToken cancellationToken = default)
-        where T : class
+    public static void AddOrUpdate(this DbContext ctx, object entity)
     {
-        var existing = await dbSet
-            .AsNoTracking()
-            .FirstOrDefaultAsync(predicate, cancellationToken);
+        var entry = ctx.Entry(entity);
+        switch (entry.State)
+        {
+            case EntityState.Detached:
+                ctx.Add(entity);
+                break;
+            case EntityState.Modified:
+                ctx.Update(entity);
+                break;
+            case EntityState.Added:
+                ctx.Add(entity);
+                break;
+            case EntityState.Unchanged:
+                break;
 
-        if (existing == null)
-        {
-            await dbSet.AddAsync(entity, cancellationToken);
-        }
-        else
-        {
-            dbSet.Update(entity);
+            case EntityState.Deleted:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 }

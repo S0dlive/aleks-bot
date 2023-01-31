@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RemoraDiscordBot.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AutoRoleUpdate : Migration
+    public partial class PersonalVocalUpdatePK : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,6 +29,21 @@ namespace RemoraDiscordBot.Data.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "PersonalVocals",
+                columns: table => new
+                {
+                    GuildId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ChannelId = table.Column<long>(type: "bigint", nullable: false),
+                    CategoryId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PersonalVocals", x => x.GuildId);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "UserGuildXps",
                 columns: table => new
                 {
@@ -42,6 +57,20 @@ namespace RemoraDiscordBot.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserGuildXps", x => new { x.UserId, x.GuildId });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "UserPersonalVocals",
+                columns: table => new
+                {
+                    GuildId = table.Column<long>(type: "bigint", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    ChannelId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPersonalVocals", x => new { x.UserId, x.GuildId });
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -132,7 +161,13 @@ namespace RemoraDiscordBot.Data.Migrations
                 name: "AutoRoleReactions");
 
             migrationBuilder.DropTable(
+                name: "PersonalVocals");
+
+            migrationBuilder.DropTable(
                 name: "UserGuildCreatures");
+
+            migrationBuilder.DropTable(
+                name: "UserPersonalVocals");
 
             migrationBuilder.DropTable(
                 name: "WelcomerGuilds");

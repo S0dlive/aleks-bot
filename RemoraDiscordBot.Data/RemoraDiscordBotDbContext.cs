@@ -28,12 +28,14 @@ public class RemoraDiscordBotDbContext
     public DbSet<AutoRoleChannel> AutoRoleChannels { get; set; } = null!;
     public DbSet<AutoRoleReaction> AutoRoleReactions { get; set; } = null!;
     public DbSet<PersonalVocal> PersonalVocals { get; set; } = null!;
+    public DbSet<UserPersonalVocal> UserPersonalVocals { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         var userGuildXp = modelBuilder.Entity<UserGuildXp>();
         var autoRole = modelBuilder.Entity<AutoRoleChannel>();
         var personalVocal = modelBuilder.Entity<PersonalVocal>();
+        var userPersonalVocal = modelBuilder.Entity<UserPersonalVocal>();
 
         userGuildXp
             .HasKey(x => new {x.UserId, x.GuildId});
@@ -58,6 +60,9 @@ public class RemoraDiscordBotDbContext
             .HasForeignKey(x => new {x.InstigatorMessageId, x.InstigatorGuildId});
 
         personalVocal
-            .HasKey(x => new {x.ChannelId, x.GuildId});
+            .HasKey(x => x.GuildId);
+
+        userPersonalVocal
+            .HasKey(x => new {x.UserId, x.GuildId});
     }
 }

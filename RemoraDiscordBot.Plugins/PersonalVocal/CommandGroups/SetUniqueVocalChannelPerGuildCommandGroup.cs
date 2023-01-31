@@ -42,14 +42,20 @@ public class SetUniqueVocalChannelPerGuildCommandGroup
     [Command("set")]
     [Description("Set the unique vocal channel for the current guild")]
     [Ephemeral]
-    public async Task<Result> SetUniqueVocalChannelPerGuildAsync(Snowflake channelId)
+    public async Task<Result> SetUniqueVocalChannelPerGuildAsync(
+        [Description("The channel to set as unique vocal channel")]
+        Snowflake channelId,
+        [Description("The category to append the channel to")]
+        Snowflake categoryId)
     {
         if (!_commandContext.TryGetGuildID(out var guildId))
+        {
             throw new InvalidOperationException("The command must be executed in a guild");
+        }
 
         var channel = await _channelApi.GetChannelAsync(channelId, CancellationToken.None);
 
-        await _mediator.Send(new SetUniqueVocalChannelPerGuildRequest(channelId, guildId.Value));
+        await _mediator.Send(new SetUniqueVocalChannelPerGuildRequest(channelId, guildId.Value, categoryId));
 
         return (Result) await _feedbackService.SendContextualSuccessAsync(
             $"The unique vocal channel has been set to **{channel.Entity.Name}**");

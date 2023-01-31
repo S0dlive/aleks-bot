@@ -67,7 +67,10 @@ public sealed class CreateAutoRoleHandler
 
         var selectMenu = new StringSelectComponent(
             "test",
-            ImmutableArray<ISelectOption>.Empty,
+            new List<ISelectOption>
+            {
+                new SelectOption("Option 1", "1"),
+            },
             "Select an option",
             1,
             1);

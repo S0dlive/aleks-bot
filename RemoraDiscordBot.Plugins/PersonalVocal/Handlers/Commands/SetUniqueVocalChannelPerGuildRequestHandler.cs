@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
@@ -24,14 +25,19 @@ public sealed class SetUniqueVocalChannelPerGuildRequestHandler
         SetUniqueVocalChannelPerGuildRequest request,
         CancellationToken cancellationToken)
     {
-        await _dbContext.PersonalVocals.AddOrUpdateAsync(
-            new Data.Domain.PersonalVocal.PersonalVocal
-            {
-                GuildId = request.GuildId.ToLong(),
-                ChannelId = request.ChannelId.ToLong()
-            },
-            x => x.GuildId == request.GuildId.ToLong(),
-            cancellationToken);
+        var personalVocal = await _dbContext.PersonalVocals
+            .FirstOrDefaultAsync(
+                x => x.GuildId == request.GuildId.ToLong(),
+                cancellationToken) ?? new Data.Domain.PersonalVocal.PersonalVocal
+        {
+            GuildId = request.GuildId.ToLong(),
+            ChannelId = request.ChannelId.ToLong(),
+            CategoryId = request.CategoryId.ToLong()
+        };
+        
+        personalVocal.ChannelId = request.ChannelId.ToLong();
+
+        _dbContext.AddOrUpdate(personalVocal);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
