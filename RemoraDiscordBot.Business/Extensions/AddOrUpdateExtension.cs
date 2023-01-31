@@ -16,7 +16,9 @@ public static class AddOrUpdateExtension
         CancellationToken cancellationToken = default)
         where T : class
     {
-        var existing = await dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
+        var existing = await dbSet
+            .AsNoTracking()
+            .FirstOrDefaultAsync(predicate, cancellationToken);
 
         if (existing == null)
         {
