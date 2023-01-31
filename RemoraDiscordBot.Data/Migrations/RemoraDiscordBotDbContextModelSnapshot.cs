@@ -122,8 +122,8 @@ namespace RemoraDiscordBot.Data.Migrations
 
             modelBuilder.Entity("RemoraDiscordBot.Data.Domain.PersonalVocal.PersonalVocal", b =>
                 {
-                    b.Property<int>("ChannelId")
-                        .HasColumnType("int");
+                    b.Property<long>("ChannelId")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("GuildId")
                         .HasColumnType("bigint");

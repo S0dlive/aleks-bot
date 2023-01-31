@@ -23,8 +23,7 @@ var host = Host.CreateDefaultBuilder(args)
                 options
                     .UseMySql(
                         hostContext.Configuration["ConnectionStrings:DefaultConnection"],
-                        ServerVersion.AutoDetect(hostContext.Configuration["ConnectionStrings:DefaultConnection"]))
-                    .LogTo(Console.WriteLine, LogLevel.Information);
+                        ServerVersion.AutoDetect(hostContext.Configuration["ConnectionStrings:DefaultConnection"]));
             })
             .AddDiscordBot(hostContext.Configuration)
             .AddMediatR(AppDomain.CurrentDomain.GetAssemblies())

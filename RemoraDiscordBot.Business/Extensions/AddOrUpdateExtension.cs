@@ -24,8 +24,7 @@ public static class AddOrUpdateExtension
         }
         else
         {
-            dbSet.Attach(entity);
-            dbSet.Entry(entity).State = EntityState.Modified;
+            dbSet.Update(entity);
         }
     }
 }

@@ -6,6 +6,6 @@ namespace RemoraDiscordBot.Data.Domain.PersonalVocal;
 
 public class PersonalVocal
 {
-    public int ChannelId { get; set; }
+    public long ChannelId { get; set; }
     public long GuildId { get; set; }
 }

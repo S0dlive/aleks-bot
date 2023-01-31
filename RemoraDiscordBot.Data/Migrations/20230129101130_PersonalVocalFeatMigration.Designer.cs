@@ -11,8 +11,8 @@ using RemoraDiscordBot.Data;
 namespace RemoraDiscordBot.Data.Migrations
 {
     [DbContext(typeof(RemoraDiscordBotDbContext))]
-    [Migration("20230128121932_PersonalVocalDomainsMigration")]
-    partial class PersonalVocalDomainsMigration
+    [Migration("20230129101130_PersonalVocalFeatMigration")]
+    partial class PersonalVocalFeatMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -125,8 +125,8 @@ namespace RemoraDiscordBot.Data.Migrations
 
             modelBuilder.Entity("RemoraDiscordBot.Data.Domain.PersonalVocal.PersonalVocal", b =>
                 {
-                    b.Property<int>("ChannelId")
-                        .HasColumnType("int");
+                    b.Property<long>("ChannelId")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("GuildId")
                         .HasColumnType("bigint");

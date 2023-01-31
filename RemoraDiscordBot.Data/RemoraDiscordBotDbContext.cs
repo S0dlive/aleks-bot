@@ -58,6 +58,6 @@ public class RemoraDiscordBotDbContext
             .HasForeignKey(x => new {x.InstigatorMessageId, x.InstigatorGuildId});
 
         personalVocal
-            .HasKey(x => new{x.ChannelId, x.GuildId});
+            .HasKey(x => new {x.ChannelId, x.GuildId});
     }
 }

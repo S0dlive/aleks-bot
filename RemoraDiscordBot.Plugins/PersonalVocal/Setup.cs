@@ -4,6 +4,9 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Remora.Commands.Extensions;
+using Remora.Discord.Gateway.Extensions;
+using RemoraDiscordBot.Plugins.PersonalVocal.CommandGroups;
+using RemoraDiscordBot.Plugins.PersonalVocal.Responders;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal;
 
@@ -13,7 +16,10 @@ public static class Setup
     {
         return serviceCollection
                 .AddCommandTree()
+                .WithCommandGroup<SetUniqueVocalChannelPerGuildCommandGroup>()
                 .Finish()
+            
+                .AddResponder<JoinPossibleVocalCreationResponder>()
             ;
     }
 }
