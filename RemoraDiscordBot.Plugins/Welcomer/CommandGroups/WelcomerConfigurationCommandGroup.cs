@@ -7,6 +7,7 @@ using MediatR;
 using Remora.Commands.Attributes;
 using Remora.Commands.Groups;
 using Remora.Discord.API.Abstractions.Objects;
+using Remora.Discord.Commands.Attributes;
 using Remora.Discord.Commands.Contexts;
 using Remora.Discord.Commands.Extensions;
 using Remora.Discord.Commands.Feedback.Messages;
@@ -42,6 +43,7 @@ public class WelcomerConfigurationCommandGroup
 
     [Command("setwelcomechannel")]
     [Description("Set the welcome channel where you are, and enable the welcomer feature.")]
+    [Ephemeral]
     public async Task<IResult> SetWelcomeChannelAsync()
     {
         if (!_commandContext.TryGetChannelID(out var channelId))
@@ -62,6 +64,7 @@ public class WelcomerConfigurationCommandGroup
 
     [Command("disable")]
     [Description("Disable the welcomer feature.")]
+    [Ephemeral]
     public async Task<IResult> DisableAsync()
     {
         if (!_commandContext.TryGetGuildID(out var guildId))
