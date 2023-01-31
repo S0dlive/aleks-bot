@@ -4,6 +4,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Remora.Discord.Caching.Extensions;
 using RemoraDiscordBot.Core;
 using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.AdvertisementGuard;
@@ -26,6 +27,7 @@ var host = Host.CreateDefaultBuilder(args)
                         ServerVersion.AutoDetect(hostContext.Configuration["ConnectionStrings:DefaultConnection"]));
             })
             .AddDiscordBot(hostContext.Configuration)
+            .AddDiscordCaching()
             .AddMediatR(AppDomain.CurrentDomain.GetAssemblies())
             .AddExperiencePlugin()
             .AddWelcomerPlugin()
