@@ -9,5 +9,8 @@ using RemoraDiscordBot.Data.Domain.PersonalVocal;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Commands;
 
-public sealed record PersistUserVocalChannelRequest(IVoiceStateUpdate GatewayEvent, Snowflake ChannelId)
+public sealed record PersistUserVocalChannelRequest(
+        Snowflake ChannelId, 
+        Snowflake UserId, 
+        Snowflake GuildId)
     : IRequest<UserPersonalVocal>;

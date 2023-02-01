@@ -28,13 +28,13 @@ public sealed class PersistUserVocalChannelRequestHandler
     {
         var userPersonalVocal = await _dbContext.UserPersonalVocals
             .FirstOrDefaultAsync(
-                x => x.UserId == request.GatewayEvent.UserID.ToLong()
-                     && x.GuildId == request.GatewayEvent.GuildID.Value.ToLong(),
+                x => x.UserId == request.UserId.ToLong()
+                     && x.GuildId == request.GuildId.ToLong(),
                 cancellationToken) ?? new UserPersonalVocal
         {
             ChannelId = request.ChannelId.ToLong(),
-            GuildId = request.GatewayEvent.GuildID.Value.ToLong(),
-            UserId = request.GatewayEvent.UserID.ToLong()
+            GuildId = request.GuildId.ToLong(),
+            UserId = request.UserId.ToLong()
         };
 
         _dbContext.AddOrUpdate(userPersonalVocal);

@@ -5,7 +5,6 @@
 using MediatR;
 using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Data;
-using RemoraDiscordBot.Data.Domain.PersonalVocal;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
 using RemoraDiscordBot.Plugins.PersonalVocal.Queries;
 
@@ -30,7 +29,7 @@ public sealed class JoinPossibleVocalCreationRequestHandler
         CancellationToken cancellationToken)
     {
         var vocalChannelBootstrap = await _mediator.Send(
-            new GetUniqueGuildVocalChannelRequest(request.GatewayEvent.GuildID.Value),
+            new GetUniqueGuildVocalChannelRequest(request.GuildId),
             cancellationToken);
 
         if (vocalChannelBootstrap is null)
@@ -38,18 +37,20 @@ public sealed class JoinPossibleVocalCreationRequestHandler
             return;
         }
 
-        if (request.GatewayEvent.ChannelID != vocalChannelBootstrap?.ChannelId.ToSnowflake())
+        if (request.ToChannelId != vocalChannelBootstrap?.ChannelId.ToSnowflake())
         {
             return;
         }
-       
+
         var newVocal = await _mediator.Send(
             new CreatePersonalUserVocalChannelRequest(
-                request.GatewayEvent.UserID,
-                request.GatewayEvent.GuildID.Value,
+                request.UserId,
+                request.GuildId,
                 vocalChannelBootstrap.CategoryId.ToSnowflake()),
             cancellationToken);
-        
-        await _mediator.Send(new PersistUserVocalChannelRequest(request.GatewayEvent, newVocal.ChannelId.ToSnowflake()), cancellationToken);
+
+        await _mediator.Send(
+            new PersistUserVocalChannelRequest(newVocal.ChannelId.ToSnowflake(), request.UserId, request.GuildId),
+            cancellationToken);
     }
 }

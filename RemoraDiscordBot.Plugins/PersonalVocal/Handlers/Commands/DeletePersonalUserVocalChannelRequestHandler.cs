@@ -16,8 +16,8 @@ public sealed class DeletePersonalUserVocalChannelRequestHandler
     : AsyncRequestHandler<DeletePersonalUserVocalChannelRequest>
 {
     private readonly IDiscordRestChannelAPI _channelApi;
-    private readonly ILogger<DeletePersonalUserVocalChannelRequestHandler> _logger;
     private readonly RemoraDiscordBotDbContext _dbContext;
+    private readonly ILogger<DeletePersonalUserVocalChannelRequestHandler> _logger;
 
     public DeletePersonalUserVocalChannelRequestHandler(
         IDiscordRestChannelAPI channelApi,
@@ -39,17 +39,14 @@ public sealed class DeletePersonalUserVocalChannelRequestHandler
 
         if (!deleteChannelAsync.IsSuccess)
         {
-            throw new InvalidOperationException("Cannot delete user vocal channel, reason: " + deleteChannelAsync.Error.Message);
+            throw new InvalidOperationException("Cannot delete user vocal channel, reason: " +
+                                                deleteChannelAsync.Error.Message);
         }
 
         _logger.LogInformation("Deleted personal vocal channel {ChannelId}", request.ChannelId);
-        
-        // remove from persistance
+
         await _dbContext.UserPersonalVocals
-            .Where(x => x.ChannelId == request.ChannelId.ToLong() 
-                        && x.GuildId == request.GuildId.ToLong()
-                        && x.UserId == request.UserId.ToLong())
+            .Where(x => x.ChannelId == request.ChannelId.ToLong())
             .ExecuteDeleteAsync(cancellationToken);
-        
     }
 }

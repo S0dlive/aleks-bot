@@ -10,6 +10,7 @@ using Remora.Discord.Caching.Abstractions;
 using Remora.Discord.Caching.Services;
 using Remora.Discord.Gateway.Responders;
 using Remora.Results;
+using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Responders;
 
@@ -42,22 +43,44 @@ public sealed class JoinPossibleVocalCreationResponder
         {
             previousState = value.Entity;
         }
-        
-        _logger.LogInformation("cached value: {CachedValue}", previousState);
 
         switch (gatewayEvent)
         {
             case not null when gatewayEvent.ChannelID is null:
-                _logger.LogInformation("User {UserId} left the channel {ChannelId}", gatewayEvent.UserID,
+                _logger.LogInformation(
+                    "User {UserId} left the channel {ChannelId}",
+                    gatewayEvent.UserID,
                     previousState?.ChannelID);
+
+                await _mediator.Send(
+                    new LeavePossibleUserPersonalVocalRequest(previousState.ChannelID.Value, gatewayEvent.UserID), ct);
+
                 break;
             case not null when gatewayEvent.ChannelID is not null && previousState is null:
-                _logger.LogInformation("User {UserId} joined the channel {ChannelId}", gatewayEvent.UserID,
+                _logger.LogInformation(
+                    "User {UserId} joined the channel {ChannelId}",
+                    gatewayEvent.UserID,
                     gatewayEvent.ChannelID);
+
+                await _mediator.Send(
+                    new JoinPossibleVocalCreationRequest(gatewayEvent.ChannelID.Value, gatewayEvent.UserID,
+                        gatewayEvent.GuildID.Value), ct);
+
                 break;
             case not null when gatewayEvent.ChannelID is not null && previousState is not null:
-                _logger.LogInformation("User {UserId} moved from channel {OldChannelId} to channel {NewChannelId}",
-                    gatewayEvent.UserID, previousState.ChannelID, gatewayEvent.ChannelID);
+                _logger.LogInformation(
+                    "User {UserId} moved from channel {OldChannelId} to channel {NewChannelId}",
+                    gatewayEvent.UserID,
+                    previousState.ChannelID,
+                    gatewayEvent.ChannelID);
+
+                await _mediator.Send(
+                    new MoveFromPossibleGhostChannelToPossibleGhostChannelRequest(
+                        previousState.ChannelID.Value,
+                        gatewayEvent.ChannelID.Value,
+                        gatewayEvent.UserID,
+                        gatewayEvent.GuildID.Value), ct);
+
                 break;
         }
 

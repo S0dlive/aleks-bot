@@ -3,13 +3,13 @@
 // See the LICENSE file in the project root for more information.
 
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Remora.Discord.API.Abstractions.Objects;
 using Remora.Discord.API.Abstractions.Rest;
-using Remora.Rest.Core;
 using RemoraDiscordBot.Business.Extensions;
+using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
-using RemoraDiscordBot.Plugins.PersonalVocal.Queries;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Handlers.Commands;
 
@@ -17,50 +17,61 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
     : AsyncRequestHandler<LeavePossibleUserPersonalVocalRequest>
 {
     private readonly IDiscordRestChannelAPI _channelApi;
+    private readonly RemoraDiscordBotDbContext _dbContext;
     private readonly ILogger<LeavePossibleUserPersonalVocalRequestHandler> _logger;
     private readonly IMediator _mediator;
 
     public LeavePossibleUserPersonalVocalRequestHandler(
         IDiscordRestChannelAPI channelApi,
         ILogger<LeavePossibleUserPersonalVocalRequestHandler> logger,
-        IMediator mediator)
+        IMediator mediator,
+        RemoraDiscordBotDbContext dbContext)
     {
         _channelApi = channelApi;
         _logger = logger;
         _mediator = mediator;
+        _dbContext = dbContext;
     }
 
     protected override async Task Handle(
         LeavePossibleUserPersonalVocalRequest request,
         CancellationToken cancellationToken)
     {
-        var userPersistantVocalChannel = await _mediator.Send(
-            new GetUserPersonalVocalRequest(
-                request.GatewayEvent.UserID,
-                request.GatewayEvent.GuildID.Value),
+        var isPersonalVocal = await _dbContext.UserPersonalVocals.AnyAsync(
+            x => x.ChannelId == request.FromChannelId.ToLong(),
             cancellationToken);
 
-        if (userPersistantVocalChannel is null)
+        if (!isPersonalVocal)
         {
-            throw new InvalidOperationException("User has no personal vocal channel");
+            _logger.LogInformation(
+                "User {UserId} left channel {ChannelId} but it's not a personal vocal",
+                request.UserId,
+                request.FromChannelId);
+            
+            return;
         }
-        
-        var channelAsync = await _channelApi.GetChannelAsync(
-            userPersistantVocalChannel.ChannelId.ToSnowflake(),
+
+        var personalVocal = await _dbContext.UserPersonalVocals.SingleAsync(
+            x => x.ChannelId.ToSnowflake() == request.FromChannelId,
             cancellationToken);
         
-        if (!channelAsync.IsSuccess)
+        var personalVocalChannel = await _channelApi.GetChannelAsync(
+            personalVocal.ChannelId.ToSnowflake(),
+            ct: cancellationToken);
+
+        if (!personalVocalChannel.IsSuccess)
         {
-            throw new InvalidOperationException("Cannot get user vocal channel, reason: " + channelAsync.Error.Message);
+            throw new InvalidOperationException("Cannot get user vocal channel, reason: " + personalVocalChannel.Error.Message);
         }
-        
-        _logger.LogInformation("User {UserId} left channel {ChannelId} with Type: {ChannelType} and Recipients: {ChannelRecipients}",
-            request.GatewayEvent.UserID,
-            channelAsync.Entity.ID,
-            channelAsync.Entity.Type,
-            channelAsync.Entity.Recipients.HasValue ? channelAsync.Entity.Recipients.Value.Count : 0);
-        
-        if (channelAsync.Entity is
+
+        _logger.LogInformation(
+            "User {UserId} left channel {ChannelId} with Type: {ChannelType} and Recipients: {ChannelRecipients}",
+            request.UserId,
+            personalVocalChannel.Entity.ID,
+            personalVocalChannel.Entity.Type,
+            personalVocalChannel.Entity.Recipients.HasValue ? personalVocalChannel.Entity.Recipients.Value.Count : 0);
+
+        if (personalVocalChannel.Entity is
             {
                 Type: ChannelType.GuildVoice,
                 Recipients:
@@ -70,11 +81,7 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
             })
         {
             await _mediator.Send(
-                new DeletePersonalUserVocalChannelRequest(
-                    request.GatewayEvent.UserID,
-                    channelAsync.Entity.ID,
-                    request.GatewayEvent.GuildID.Value),
-                cancellationToken);
+                new DeletePersonalUserVocalChannelRequest(personalVocalChannel.Entity.ID), cancellationToken);
         }
     }
 }
