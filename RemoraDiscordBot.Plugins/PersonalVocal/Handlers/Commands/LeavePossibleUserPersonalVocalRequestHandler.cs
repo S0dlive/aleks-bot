@@ -37,23 +37,18 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
         LeavePossibleUserPersonalVocalRequest request,
         CancellationToken cancellationToken)
     {
-        var isPersonalVocal = await _dbContext.UserPersonalVocals.AnyAsync(
-            x => x.ChannelId == request.FromChannelId.ToLong(),
-            cancellationToken);
-
-        if (!isPersonalVocal)
-        {
-            _logger.LogInformation(
-                "User {UserId} left channel {ChannelId} but it's not a personal vocal",
-                request.UserId,
-                request.FromChannelId);
-            
-            return;
-        }
-
         var personalVocal = await _dbContext.UserPersonalVocals.SingleAsync(
             x => x.ChannelId.ToSnowflake() == request.FromChannelId,
             cancellationToken);
+        
+        if (personalVocal is null)
+        {
+            _logger.LogInformation(
+                "User {UserId} left channel {ChannelId} but no personal vocal channel found",
+                request.UserId,
+                request.FromChannelId);
+            return;
+        }
         
         var personalVocalChannel = await _channelApi.GetChannelAsync(
             personalVocal.ChannelId.ToSnowflake(),
