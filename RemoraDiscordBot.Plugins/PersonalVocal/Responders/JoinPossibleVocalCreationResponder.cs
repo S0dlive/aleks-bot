@@ -56,7 +56,7 @@ public sealed class JoinPossibleVocalCreationResponder
                     new LeavePossibleUserPersonalVocalRequest(previousState.ChannelID.Value, gatewayEvent.UserID), ct);
 
                 break;
-            case not null when gatewayEvent.ChannelID is not null && previousState is null:
+            case not null when gatewayEvent.ChannelID is not null && previousState?.ChannelID is null:
                 _logger.LogInformation(
                     "User {UserId} joined the channel {ChannelId}",
                     gatewayEvent.UserID,
@@ -67,7 +67,7 @@ public sealed class JoinPossibleVocalCreationResponder
                         gatewayEvent.GuildID.Value), ct);
 
                 break;
-            case not null when gatewayEvent.ChannelID is not null && previousState is not null:
+            case not null when gatewayEvent.ChannelID is not null && previousState?.ChannelID != null:
                 _logger.LogInformation(
                     "User {UserId} moved from channel {OldChannelId} to channel {NewChannelId}",
                     gatewayEvent.UserID,
