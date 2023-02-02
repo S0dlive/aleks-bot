@@ -83,8 +83,13 @@ public sealed class JoinPossibleVocalCreationResponder
 
                 break;
         }
+        
+        await _cacheService.CacheAsync(key, gatewayEvent, ct);
 
-        await _cacheService.CacheAsync<IVoiceStateUpdate>(key, gatewayEvent, ct);
+        if (gatewayEvent.ChannelID is null)
+        {
+            await _cacheService.EvictAsync<IVoiceStateUpdate>(key, ct);
+        }
 
         return Result.FromSuccess();
     }

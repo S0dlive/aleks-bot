@@ -37,8 +37,8 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
         LeavePossibleUserPersonalVocalRequest request,
         CancellationToken cancellationToken)
     {
-        var personalVocal = await _dbContext.UserPersonalVocals.SingleAsync(
-            x => x.ChannelId.ToSnowflake() == request.FromChannelId,
+        var personalVocal = await _dbContext.UserPersonalVocals.FirstOrDefaultAsync(
+            x => x.ChannelId == request.FromChannelId.ToLong(),
             cancellationToken);
         
         if (personalVocal is null)
