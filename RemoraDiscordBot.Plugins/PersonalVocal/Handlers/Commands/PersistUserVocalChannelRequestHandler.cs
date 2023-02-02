@@ -1,46 +1,39 @@
-// Copyright (c) Alexis Chân Gridel. All Rights Reserved.
+﻿// Copyright (c) Alexis Chân Gridel. All Rights Reserved.
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using RemoraDiscordBot.Business.Extensions;
-using RemoraDiscordBot.Data;
-using RemoraDiscordBot.Data.Domain.PersonalVocal;
+using Remora.Rest.Core;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
+using RemoraDiscordBot.Plugins.PersonalVocal.Model;
+using RemoraDiscordBot.Plugins.PersonalVocal.Services;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Handlers.Commands;
 
 public sealed class PersistUserVocalChannelRequestHandler
-    : IRequestHandler<PersistUserVocalChannelRequest, UserPersonalVocal>
+    : IRequestHandler<PersistUserVocalChannelRequest, Tuple<UserVocalChannel, Snowflake>>
 {
-    private readonly RemoraDiscordBotDbContext _dbContext;
+    private readonly IPersonalVocalService _personalVocalService;
 
     public PersistUserVocalChannelRequestHandler(
-        RemoraDiscordBotDbContext dbContext)
+        IPersonalVocalService personalVocalService)
     {
-        _dbContext = dbContext;
+        _personalVocalService = personalVocalService;
     }
 
-    public async Task<UserPersonalVocal> Handle(
+    public async Task<Tuple<UserVocalChannel, Snowflake>> Handle(
         PersistUserVocalChannelRequest request,
         CancellationToken cancellationToken)
     {
-        var userPersonalVocal = await _dbContext.UserPersonalVocals
-            .FirstOrDefaultAsync(
-                x => x.UserId == request.GatewayEvent.UserID.ToLong()
-                     && x.GuildId == request.GatewayEvent.GuildID.Value.ToLong(),
-                cancellationToken) ?? new UserPersonalVocal
+        if (_personalVocalService.HasVoiceChannel(request.UserId, request.GuildId))
         {
-            ChannelId = request.ChannelId.ToLong(),
-            GuildId = request.GatewayEvent.GuildID.Value.ToLong(),
-            UserId = request.GatewayEvent.UserID.ToLong()
-        };
+            _personalVocalService.DeleteVoiceChannel(request.UserId, request.GuildId);
+        }
 
-        _dbContext.AddOrUpdate(userPersonalVocal);
+        _personalVocalService.CreateVoiceChannel(request.UserId, request.GuildId, request.ChannelId);
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        return userPersonalVocal;
+        return new Tuple<UserVocalChannel, Snowflake>(
+            new UserVocalChannel {UserId = request.UserId, GuildId = request.GuildId},
+            request.ChannelId);
     }
 }

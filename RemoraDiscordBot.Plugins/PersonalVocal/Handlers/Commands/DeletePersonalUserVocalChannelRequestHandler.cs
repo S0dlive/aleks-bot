@@ -1,4 +1,4 @@
-// Copyright (c) Alexis Chân Gridel. All Rights Reserved.
+﻿// Copyright (c) Alexis Chân Gridel. All Rights Reserved.
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
@@ -17,16 +17,13 @@ public sealed class DeletePersonalUserVocalChannelRequestHandler
 {
     private readonly IDiscordRestChannelAPI _channelApi;
     private readonly ILogger<DeletePersonalUserVocalChannelRequestHandler> _logger;
-    private readonly RemoraDiscordBotDbContext _dbContext;
 
     public DeletePersonalUserVocalChannelRequestHandler(
         IDiscordRestChannelAPI channelApi,
-        ILogger<DeletePersonalUserVocalChannelRequestHandler> logger,
-        RemoraDiscordBotDbContext dbContext)
+        ILogger<DeletePersonalUserVocalChannelRequestHandler> logger)
     {
         _channelApi = channelApi;
         _logger = logger;
-        _dbContext = dbContext;
     }
 
     protected override async Task Handle(
@@ -39,17 +36,10 @@ public sealed class DeletePersonalUserVocalChannelRequestHandler
 
         if (!deleteChannelAsync.IsSuccess)
         {
-            throw new InvalidOperationException("Cannot delete user vocal channel, reason: " + deleteChannelAsync.Error.Message);
+            throw new InvalidOperationException("Cannot delete user vocal channel, reason: " +
+                                                deleteChannelAsync.Error.Message);
         }
 
         _logger.LogInformation("Deleted personal vocal channel {ChannelId}", request.ChannelId);
-        
-        // remove from persistance
-        await _dbContext.UserPersonalVocals
-            .Where(x => x.ChannelId == request.ChannelId.ToLong() 
-                        && x.GuildId == request.GuildId.ToLong()
-                        && x.UserId == request.UserId.ToLong())
-            .ExecuteDeleteAsync(cancellationToken);
-        
     }
 }

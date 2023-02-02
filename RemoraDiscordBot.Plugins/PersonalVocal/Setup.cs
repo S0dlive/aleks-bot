@@ -7,6 +7,7 @@ using Remora.Commands.Extensions;
 using Remora.Discord.Gateway.Extensions;
 using RemoraDiscordBot.Plugins.PersonalVocal.CommandGroups;
 using RemoraDiscordBot.Plugins.PersonalVocal.Responders;
+using RemoraDiscordBot.Plugins.PersonalVocal.Services;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal;
 
@@ -20,6 +21,8 @@ public static class Setup
                 .Finish()
             
                 .AddResponder<JoinPossibleVocalCreationResponder>()
+            
+                .AddSingleton<IPersonalVocalService, PersonalVocalService>()
             ;
     }
 }

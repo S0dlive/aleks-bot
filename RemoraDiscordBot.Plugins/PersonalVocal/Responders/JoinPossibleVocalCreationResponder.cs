@@ -5,63 +5,65 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Remora.Discord.API.Abstractions.Gateway.Events;
-using Remora.Discord.API.Abstractions.Objects;
-using Remora.Discord.Caching.Abstractions;
-using Remora.Discord.Caching.Services;
 using Remora.Discord.Gateway.Responders;
 using Remora.Results;
+using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
+using RemoraDiscordBot.Plugins.PersonalVocal.Services;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Responders;
 
 public sealed class JoinPossibleVocalCreationResponder
     : IResponder<IVoiceStateUpdate>
 {
-    private readonly CacheService _cacheService;
     private readonly ILogger<JoinPossibleVocalCreationResponder> _logger;
     private readonly IMediator _mediator;
+    private readonly IPersonalVocalService _personalVocalService;
 
     public JoinPossibleVocalCreationResponder(
         IMediator mediator,
         ILogger<JoinPossibleVocalCreationResponder> logger,
-        CacheService cacheService)
+        IPersonalVocalService personalVocalService)
     {
         _mediator = mediator;
         _logger = logger;
-        _cacheService = cacheService;
+        _personalVocalService = personalVocalService;
     }
 
     public async Task<Result> RespondAsync(
         IVoiceStateUpdate gatewayEvent,
         CancellationToken ct = default)
     {
-        var key = CacheKey.StringKey($"VoiceState:{gatewayEvent.GuildID}:{gatewayEvent.UserID}");
-
-        var value = await _cacheService.TryGetValueAsync<IVoiceStateUpdate>(key, ct);
-        IVoiceState previousState = null;
-        if (value.IsSuccess)
-        {
-            previousState = value.Entity;
-        }
-        
-        _logger.LogInformation("cached value: {CachedValue}", previousState);
+        var previousChannel = _personalVocalService.GetVoiceChannel(gatewayEvent.UserID);
 
         switch (gatewayEvent)
         {
             case not null when gatewayEvent.ChannelID is null:
-                _logger.LogInformation("User {UserId} left the channel {ChannelId}", gatewayEvent.UserID,
-                    previousState?.ChannelID);
+                await _mediator.Send(
+                    new LeavePossibleUserPersonalVocalRequest(previousChannel, gatewayEvent.UserID, gatewayEvent), ct);
+
                 break;
-            case not null when gatewayEvent.ChannelID is not null && previousState is null:
-                _logger.LogInformation("User {UserId} joined the channel {ChannelId}", gatewayEvent.UserID,
-                    gatewayEvent.ChannelID);
+            case not null when gatewayEvent.ChannelID is not null && previousChannel is null:
+                await _mediator.Send(
+                    new JoinPossibleVocalCreationRequest(
+                        gatewayEvent.ChannelID.Value,
+                        gatewayEvent.UserID,
+                        gatewayEvent.GuildID.Value,
+                        gatewayEvent),
+                    ct);
+
                 break;
-            case not null when gatewayEvent.ChannelID is not null && previousState is not null:
-                _logger.LogInformation("User {UserId} moved from channel {OldChannelId} to channel {NewChannelId}",
-                    gatewayEvent.UserID, previousState.ChannelID, gatewayEvent.ChannelID);
+            case not null when gatewayEvent.ChannelID is not null && previousChannel != null:
+                await _mediator.Send(
+                    new MoveFromPossibleGhostChannelToPossibleGhostChannelRequest(
+                        previousChannel,
+                        gatewayEvent.ChannelID.Value,
+                        gatewayEvent.UserID,
+                        gatewayEvent.GuildID.Value,
+                        gatewayEvent),
+                    ct);
+
                 break;
         }
-
-        await _cacheService.CacheAsync<IVoiceStateUpdate>(key, gatewayEvent, ct);
 
         return Result.FromSuccess();
     }

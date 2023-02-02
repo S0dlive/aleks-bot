@@ -8,7 +8,5 @@ using Remora.Rest.Core;
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Commands;
 
 public sealed record DeletePersonalUserVocalChannelRequest(
-        Snowflake UserId,
-        Snowflake ChannelId,
-        Snowflake GuildId)
+        Snowflake ChannelId)
     : IRequest;
