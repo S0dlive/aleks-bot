@@ -5,7 +5,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Remora.Discord.API.Abstractions.Gateway.Events;
-using Remora.Discord.API.Objects;
 using Remora.Discord.Caching.Extensions;
 using Remora.Discord.Caching.Services;
 using RemoraDiscordBot.Core;
@@ -30,10 +29,10 @@ var host = Host.CreateDefaultBuilder(args)
                         ServerVersion.AutoDetect(hostContext.Configuration["ConnectionStrings:DefaultConnection"]));
             })
             .AddDiscordBot(hostContext.Configuration)
-            .Configure<CacheSettings>(c =>
+            .Configure<CacheSettings>(cacheSettings =>
             {
-                c.SetSlidingExpiration<IVoiceStateUpdate>(null);
-                c.SetAbsoluteExpiration<IVoiceStateUpdate>(null);
+                cacheSettings.SetSlidingExpiration<IVoiceStateUpdate>(null);
+                cacheSettings.SetAbsoluteExpiration<IVoiceStateUpdate>(null);
             })
             .AddDiscordCaching()
             .AddMediatR(AppDomain.CurrentDomain.GetAssemblies())

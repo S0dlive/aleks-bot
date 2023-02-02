@@ -10,5 +10,6 @@ namespace RemoraDiscordBot.Plugins.PersonalVocal.Commands;
 
 public sealed record LeavePossibleUserPersonalVocalRequest(
         Snowflake FromChannelId,
-        Snowflake UserId)
+        Snowflake UserId,
+        IVoiceStateUpdate GatewayEvent)
     : IRequest;

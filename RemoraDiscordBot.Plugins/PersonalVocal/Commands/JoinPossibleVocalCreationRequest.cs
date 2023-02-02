@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using MediatR;
+using Remora.Discord.API.Abstractions.Gateway.Events;
 using Remora.Rest.Core;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Commands;
@@ -10,5 +11,6 @@ namespace RemoraDiscordBot.Plugins.PersonalVocal.Commands;
 public sealed record JoinPossibleVocalCreationRequest(
         Snowflake ToChannelId,
         Snowflake UserId,
-        Snowflake GuildId)
+        Snowflake GuildId,
+        IVoiceStateUpdate GatewayEvent)
     : IRequest;

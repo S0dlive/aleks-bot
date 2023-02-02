@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using MediatR;
+using Remora.Discord.API.Abstractions.Gateway.Events;
 using Remora.Rest.Core;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Commands;
@@ -11,5 +12,6 @@ public sealed record MoveFromPossibleGhostChannelToPossibleGhostChannelRequest(
         Snowflake? FromChannelId,
         Snowflake ToChannelId,
         Snowflake UserId,
-        Snowflake ToGuildId)
+        Snowflake ToGuildId,
+        IVoiceStateUpdate GatewayEvent)
     : IRequest;

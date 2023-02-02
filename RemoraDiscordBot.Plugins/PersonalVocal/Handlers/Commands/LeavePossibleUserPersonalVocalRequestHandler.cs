@@ -5,8 +5,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Remora.Discord.API.Abstractions.Gateway.Events;
 using Remora.Discord.API.Abstractions.Objects;
 using Remora.Discord.API.Abstractions.Rest;
+using Remora.Discord.Caching.Abstractions;
+using Remora.Discord.Caching.Services;
 using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
@@ -20,25 +23,31 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
     private readonly RemoraDiscordBotDbContext _dbContext;
     private readonly ILogger<LeavePossibleUserPersonalVocalRequestHandler> _logger;
     private readonly IMediator _mediator;
+    private readonly CacheService _cacheService;
 
     public LeavePossibleUserPersonalVocalRequestHandler(
         IDiscordRestChannelAPI channelApi,
         ILogger<LeavePossibleUserPersonalVocalRequestHandler> logger,
         IMediator mediator,
-        RemoraDiscordBotDbContext dbContext)
+        RemoraDiscordBotDbContext dbContext,
+        CacheService cacheService)
     {
         _channelApi = channelApi;
         _logger = logger;
         _mediator = mediator;
         _dbContext = dbContext;
+        _cacheService = cacheService;
     }
 
     protected override async Task Handle(
         LeavePossibleUserPersonalVocalRequest request,
         CancellationToken cancellationToken)
     {
+        var key = CacheKey.StringKey($"VoiceState:{request.GatewayEvent.GuildID}:{request.GatewayEvent.UserID}");
+        var cache = await _cacheService.TryGetValueAsync<IVoiceStateUpdate>(key, cancellationToken);
+        
         var personalVocal = await _dbContext.UserPersonalVocals.FirstOrDefaultAsync(
-            x => x.ChannelId == request.FromChannelId.ToLong(),
+            x => x.ChannelId == cache.Entity.ChannelID.Value.ToLong(),
             cancellationToken);
         
         if (personalVocal is null)
@@ -46,12 +55,12 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
             _logger.LogInformation(
                 "User {UserId} left channel {ChannelId} but no personal vocal channel found",
                 request.UserId,
-                request.FromChannelId);
+                cache.Entity.ChannelID.Value);
             return;
         }
         
         var personalVocalChannel = await _channelApi.GetChannelAsync(
-            personalVocal.ChannelId.ToSnowflake(),
+            cache.Entity.ChannelID.Value,
             ct: cancellationToken);
 
         if (!personalVocalChannel.IsSuccess)

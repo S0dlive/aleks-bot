@@ -53,7 +53,7 @@ public sealed class JoinPossibleVocalCreationResponder
                     previousState?.ChannelID);
 
                 await _mediator.Send(
-                    new LeavePossibleUserPersonalVocalRequest(previousState.ChannelID.Value, gatewayEvent.UserID), ct);
+                    new LeavePossibleUserPersonalVocalRequest(previousState.ChannelID.Value, gatewayEvent.UserID, gatewayEvent), ct);
 
                 break;
             case not null when gatewayEvent.ChannelID is not null && previousState?.ChannelID is null:
@@ -63,8 +63,12 @@ public sealed class JoinPossibleVocalCreationResponder
                     gatewayEvent.ChannelID);
 
                 await _mediator.Send(
-                    new JoinPossibleVocalCreationRequest(gatewayEvent.ChannelID.Value, gatewayEvent.UserID,
-                        gatewayEvent.GuildID.Value), ct);
+                    new JoinPossibleVocalCreationRequest(
+                        gatewayEvent.ChannelID.Value,
+                        gatewayEvent.UserID,
+                        gatewayEvent.GuildID.Value,
+                        gatewayEvent),
+                    ct);
 
                 break;
             case not null when gatewayEvent.ChannelID is not null && previousState?.ChannelID != null:
@@ -79,12 +83,17 @@ public sealed class JoinPossibleVocalCreationResponder
                         previousState.ChannelID.Value,
                         gatewayEvent.ChannelID.Value,
                         gatewayEvent.UserID,
-                        gatewayEvent.GuildID.Value), ct);
+                        gatewayEvent.GuildID.Value,
+                        gatewayEvent),
+                    ct);
 
                 break;
         }
-        
-        await _cacheService.CacheAsync(key, gatewayEvent, ct);
+
+        if (previousState?.ChannelID is null)
+        {
+            await _cacheService.CacheAsync<IVoiceStateUpdate>(key, gatewayEvent, ct);
+        }
 
         if (gatewayEvent.ChannelID is null)
         {
