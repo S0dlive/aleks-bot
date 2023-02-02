@@ -1,4 +1,4 @@
-// Copyright (c) Alexis Chân Gridel. All Rights Reserved.
+﻿// Copyright (c) Alexis Chân Gridel. All Rights Reserved.
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
@@ -7,14 +7,16 @@ using Microsoft.Extensions.Logging;
 using Remora.Discord.API.Abstractions.Objects;
 using Remora.Discord.API.Abstractions.Rest;
 using Remora.Discord.API.Objects;
+using Remora.Rest.Core;
 using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Data.Domain.PersonalVocal;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
+using RemoraDiscordBot.Plugins.PersonalVocal.Model;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Handlers.Commands;
 
 public sealed class CreatePersonalUserVocalChannelRequestHandler
-    : IRequestHandler<CreatePersonalUserVocalChannelRequest, UserPersonalVocal>
+    : IRequestHandler<CreatePersonalUserVocalChannelRequest, Tuple<UserVocalChannel, Snowflake>>
 {
     private readonly IDiscordRestChannelAPI _channelApi;
     private readonly IDiscordRestGuildAPI _guildApi;
@@ -33,7 +35,7 @@ public sealed class CreatePersonalUserVocalChannelRequestHandler
         _logger = logger;
     }
 
-    public async Task<UserPersonalVocal> Handle(CreatePersonalUserVocalChannelRequest request, CancellationToken cancellationToken)
+    public async Task<Tuple<UserVocalChannel, Snowflake>> Handle(CreatePersonalUserVocalChannelRequest request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Attempting to create a channel for user {UserId} in guild {GuildId}", request.UserId, request.GuildId);
         
@@ -77,11 +79,12 @@ public sealed class CreatePersonalUserVocalChannelRequestHandler
             throw new InvalidOperationException("Cannot create a channel for reason: " + modifyGuildMemberAsync.Error.Message);
         }
         
-        return new UserPersonalVocal
+        var userVocalChannel = new UserVocalChannel
         {
-            UserId = request.UserId.ToLong(),
-            GuildId = request.GuildId.ToLong(),
-            ChannelId = channel.Entity.ID.ToLong()
+            UserId = request.UserId,
+            GuildId = request.GuildId
         };
+        
+        return new Tuple<UserVocalChannel, Snowflake>(userVocalChannel, channel.Entity.ID);
     }
 }

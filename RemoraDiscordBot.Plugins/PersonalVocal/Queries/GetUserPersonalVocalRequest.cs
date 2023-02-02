@@ -5,10 +5,11 @@
 using MediatR;
 using Remora.Rest.Core;
 using RemoraDiscordBot.Data.Domain.PersonalVocal;
+using RemoraDiscordBot.Plugins.PersonalVocal.Model;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Queries;
 
 public sealed record GetUserPersonalVocalRequest(
         Snowflake UserId,
         Snowflake GuildId)
-    : IRequest<UserPersonalVocal?>;
+    : IRequest<Tuple<UserVocalChannel, Snowflake>?>;

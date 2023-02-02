@@ -3,25 +3,20 @@
 // See the LICENSE file in the project root for more information.
 
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using RemoraDiscordBot.Business.Extensions;
-using RemoraDiscordBot.Data;
-using RemoraDiscordBot.Data.Domain.PersonalVocal;
+using Remora.Rest.Core;
+using RemoraDiscordBot.Plugins.PersonalVocal.Model;
 using RemoraDiscordBot.Plugins.PersonalVocal.Queries;
+using RemoraDiscordBot.Plugins.PersonalVocal.Services;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Handlers.Queries;
 
-public sealed record GetUserPersonalVocalRequestHandler(RemoraDiscordBotDbContext DbContext)
-    : IRequestHandler<GetUserPersonalVocalRequest, UserPersonalVocal?>
+public sealed record GetUserPersonalVocalRequestHandler(IPersonalVocalService PersonalVocalService)
+    : IRequestHandler<GetUserPersonalVocalRequest, Tuple<UserVocalChannel, Snowflake>?>
 {
-    public async Task<UserPersonalVocal?> Handle(
+    public async Task<Tuple<UserVocalChannel, Snowflake>?> Handle(
         GetUserPersonalVocalRequest request,
         CancellationToken cancellationToken)
     {
-        return await DbContext.UserPersonalVocals
-            .FirstOrDefaultAsync(
-                x => x.UserId == request.UserId.ToLong()
-                     && x.GuildId == request.GuildId.ToLong(),
-                cancellationToken);
+        return PersonalVocalService.GetVoiceChannel(request.UserId, request.GuildId);
     }
 }

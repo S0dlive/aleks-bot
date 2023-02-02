@@ -4,10 +4,7 @@
 
 using MediatR;
 using Remora.Discord.API.Abstractions.Gateway.Events;
-using Remora.Discord.Caching.Abstractions;
-using Remora.Discord.Caching.Services;
 using Remora.Rest.Core;
-using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
 using RemoraDiscordBot.Plugins.PersonalVocal.Services;
 
@@ -17,11 +14,14 @@ public sealed class MoveFromPossibleGhostChannelToPossibleGhostChannelRequestHan
     : AsyncRequestHandler<MoveFromPossibleGhostChannelToPossibleGhostChannelRequest>
 {
     private readonly IMediator _mediator;
+    private readonly IPersonalVocalService _personalVocalService;
 
     public MoveFromPossibleGhostChannelToPossibleGhostChannelRequestHandler(
-        IMediator mediator) 
+        IMediator mediator, 
+        IPersonalVocalService personalVocalService)
     {
         _mediator = mediator;
+        _personalVocalService = personalVocalService;
     }
 
     protected override async Task Handle(
@@ -31,10 +31,21 @@ public sealed class MoveFromPossibleGhostChannelToPossibleGhostChannelRequestHan
         switch (request.FromChannelId.HasValue)
         {
             case false:
-                await MoveFromNoChannelToPossibleGhostChannelAsync(request.ToChannelId, request.UserId, request.ToGuildId, request.GatewayEvent, cancellationToken);
+                await MoveFromNoChannelToPossibleGhostChannelAsync(
+                    request.ToChannelId,
+                    request.UserId,
+                    request.ToGuildId,
+                    request.GatewayEvent,
+                    cancellationToken);
                 break;
             case true:
-                await MoveFromPossibleGhostChannelToPossibleGhostChannelAsync(request.FromChannelId, request.ToChannelId, request.UserId, request.ToGuildId, request.GatewayEvent, cancellationToken);
+                await MoveFromPossibleGhostChannelToPossibleGhostChannelAsync(
+                    request.FromChannelId.Value,
+                    request.ToChannelId,
+                    request.UserId,
+                    request.ToGuildId,
+                    request.GatewayEvent,
+                    cancellationToken);
                 break;
         }
     }
@@ -47,8 +58,12 @@ public sealed class MoveFromPossibleGhostChannelToPossibleGhostChannelRequestHan
         IVoiceStateUpdate gatewayEvent,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(new LeavePossibleUserPersonalVocalRequest(requestFromChannelId.Value, requestUserId, gatewayEvent), cancellationToken);
-        await _mediator.Send(new JoinPossibleVocalCreationRequest(requestToChannelId, requestUserId, requestToGuildId, gatewayEvent), cancellationToken);
+        await _mediator.Send(
+            new LeavePossibleUserPersonalVocalRequest(requestFromChannelId.Value, requestUserId, gatewayEvent),
+            cancellationToken);
+        await _mediator.Send(
+            new JoinPossibleVocalCreationRequest(requestToChannelId, requestUserId, requestToGuildId, gatewayEvent),
+            cancellationToken);
     }
 
     private async Task MoveFromNoChannelToPossibleGhostChannelAsync(
@@ -58,6 +73,8 @@ public sealed class MoveFromPossibleGhostChannelToPossibleGhostChannelRequestHan
         IVoiceStateUpdate gatewayEvent,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(new JoinPossibleVocalCreationRequest(toChannelId.Value, userId, toGuildId, gatewayEvent), cancellationToken);
+        await _mediator.Send(
+            new JoinPossibleVocalCreationRequest(toChannelId.Value, userId, toGuildId, gatewayEvent),
+            cancellationToken);
     }
 }

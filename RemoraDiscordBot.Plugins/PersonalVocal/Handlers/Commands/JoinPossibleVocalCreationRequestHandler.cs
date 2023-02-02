@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using MediatR;
+using Microsoft.Extensions.Logging;
 using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
 using RemoraDiscordBot.Plugins.PersonalVocal.Queries;
@@ -15,13 +16,16 @@ public sealed class JoinPossibleVocalCreationRequestHandler
 {
     private readonly IMediator _mediator;
     private readonly IPersonalVocalService _personalVocalService;
+    private readonly ILogger<JoinPossibleVocalCreationRequestHandler> _logger;
 
     public JoinPossibleVocalCreationRequestHandler(
         IMediator mediator,
-        IPersonalVocalService personalVocalService)
+        IPersonalVocalService personalVocalService, 
+        ILogger<JoinPossibleVocalCreationRequestHandler> logger)
     {
         _mediator = mediator;
         _personalVocalService = personalVocalService;
+        _logger = logger;
     }
 
     protected override async Task Handle(
@@ -41,7 +45,7 @@ public sealed class JoinPossibleVocalCreationRequestHandler
         {
             return;
         }
-
+        
         var newVocal = await _mediator.Send(
             new CreatePersonalUserVocalChannelRequest(
                 request.UserId,
@@ -49,11 +53,10 @@ public sealed class JoinPossibleVocalCreationRequestHandler
                 vocalChannelBootstrap.CategoryId.ToSnowflake()),
             cancellationToken);
 
-        _personalVocalService.LeaveVoiceChannel(request.UserId);
-        _personalVocalService.JoinVoiceChannel(request.UserId, newVocal.ChannelId.ToSnowflake());
+        _personalVocalService.JoinVoiceChannel(request.UserId, newVocal.Item2);
 
         await _mediator.Send(
-            new PersistUserVocalChannelRequest(newVocal.ChannelId.ToSnowflake(), request.UserId, request.GuildId),
+            new PersistUserVocalChannelRequest(newVocal.Item2, request.UserId, request.GuildId),
             cancellationToken);
     }
 }

@@ -13,6 +13,7 @@ using Remora.Discord.Caching.Services;
 using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
+using RemoraDiscordBot.Plugins.PersonalVocal.Services;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Handlers.Commands;
 
@@ -20,23 +21,20 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
     : AsyncRequestHandler<LeavePossibleUserPersonalVocalRequest>
 {
     private readonly IDiscordRestChannelAPI _channelApi;
-    private readonly RemoraDiscordBotDbContext _dbContext;
     private readonly ILogger<LeavePossibleUserPersonalVocalRequestHandler> _logger;
     private readonly IMediator _mediator;
-    private readonly CacheService _cacheService;
+    private readonly IPersonalVocalService _personalVocalService;
 
     public LeavePossibleUserPersonalVocalRequestHandler(
         IDiscordRestChannelAPI channelApi,
         ILogger<LeavePossibleUserPersonalVocalRequestHandler> logger,
-        IMediator mediator,
-        RemoraDiscordBotDbContext dbContext,
-        CacheService cacheService)
+        IMediator mediator, 
+        IPersonalVocalService personalVocalService)
     {
         _channelApi = channelApi;
         _logger = logger;
         _mediator = mediator;
-        _dbContext = dbContext;
-        _cacheService = cacheService;
+        _personalVocalService = personalVocalService;
     }
 
     protected override async Task Handle(
@@ -48,16 +46,9 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
             return;
         }
         
-        var personalVocal = await _dbContext.UserPersonalVocals.FirstOrDefaultAsync(
-            x => x.ChannelId == request.FromChannelId.Value.ToLong(),
-            cancellationToken);
-        
-        if (personalVocal is null)
+        if (!_personalVocalService.HasVoiceChannel(request.UserId, request.GatewayEvent.GuildID.Value))
         {
-            _logger.LogInformation(
-                "User {UserId} left channel {ChannelId} but no personal vocal channel found",
-                request.UserId,
-                request.FromChannelId.Value);
+            _personalVocalService.LeaveVoiceChannel(request.UserId);
             return;
         }
         
@@ -70,13 +61,6 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
             throw new InvalidOperationException("Cannot get user vocal channel, reason: " + personalVocalChannel.Error.Message);
         }
 
-        _logger.LogInformation(
-            "User {UserId} left channel {ChannelId} with Type: {ChannelType} and Recipients: {ChannelRecipients}",
-            request.UserId,
-            personalVocalChannel.Entity.ID,
-            personalVocalChannel.Entity.Type,
-            personalVocalChannel.Entity.Recipients.HasValue ? personalVocalChannel.Entity.Recipients.Value.Count : 0);
-
         if (personalVocalChannel.Entity is
             {
                 Type: ChannelType.GuildVoice,
@@ -86,6 +70,7 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
                 }
             })
         {
+            _personalVocalService.LeaveVoiceChannel(request.UserId);
             await _mediator.Send(
                 new DeletePersonalUserVocalChannelRequest(personalVocalChannel.Entity.ID), cancellationToken);
         }

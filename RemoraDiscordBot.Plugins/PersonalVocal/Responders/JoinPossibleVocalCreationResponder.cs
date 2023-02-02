@@ -38,25 +38,11 @@ public sealed class JoinPossibleVocalCreationResponder
         switch (gatewayEvent)
         {
             case not null when gatewayEvent.ChannelID is null:
-                _logger.LogInformation(
-                    "User {UserId} left the channel {ChannelId}",
-                    gatewayEvent.UserID,
-                    previousChannel);
-
-                _personalVocalService.LeaveVoiceChannel(gatewayEvent.UserID);
-
                 await _mediator.Send(
                     new LeavePossibleUserPersonalVocalRequest(previousChannel, gatewayEvent.UserID, gatewayEvent), ct);
 
                 break;
             case not null when gatewayEvent.ChannelID is not null && previousChannel is null:
-                _logger.LogInformation(
-                    "User {UserId} joined the channel {ChannelId}",
-                    gatewayEvent.UserID,
-                    gatewayEvent.ChannelID);
-
-                _personalVocalService.JoinVoiceChannel(gatewayEvent.UserID, gatewayEvent.ChannelID.Value);
-
                 await _mediator.Send(
                     new JoinPossibleVocalCreationRequest(
                         gatewayEvent.ChannelID.Value,
@@ -67,15 +53,6 @@ public sealed class JoinPossibleVocalCreationResponder
 
                 break;
             case not null when gatewayEvent.ChannelID is not null && previousChannel != null:
-                _logger.LogInformation(
-                    "User {UserId} moved from channel {OldChannelId} to channel {NewChannelId}",
-                    gatewayEvent.UserID,
-                    previousChannel,
-                    gatewayEvent.ChannelID);
-
-                _personalVocalService.LeaveVoiceChannel(gatewayEvent.UserID);
-                _personalVocalService.JoinVoiceChannel(gatewayEvent.UserID, gatewayEvent.ChannelID.Value);
-
                 await _mediator.Send(
                     new MoveFromPossibleGhostChannelToPossibleGhostChannelRequest(
                         previousChannel,
