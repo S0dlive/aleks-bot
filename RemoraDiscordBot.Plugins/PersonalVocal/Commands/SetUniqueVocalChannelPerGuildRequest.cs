@@ -7,8 +7,5 @@ using Remora.Rest.Core;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Commands;
 
-public sealed record SetUniqueVocalChannelPerGuildRequest(
-        Snowflake ChannelId,
-        Snowflake GuildId,
-        Snowflake CategoryId)
+public sealed record SetUniqueVocalChannelPerGuildRequest(Snowflake ChannelId, Snowflake GuildId, Snowflake CategoryId)
     : IRequest;

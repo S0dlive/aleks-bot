@@ -9,32 +9,25 @@ using Remora.Discord.Caching.Services;
 using Remora.Rest.Core;
 using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.PersonalVocal.Commands;
+using RemoraDiscordBot.Plugins.PersonalVocal.Services;
 
 namespace RemoraDiscordBot.Plugins.PersonalVocal.Handlers.Commands;
 
 public sealed class MoveFromPossibleGhostChannelToPossibleGhostChannelRequestHandler
     : AsyncRequestHandler<MoveFromPossibleGhostChannelToPossibleGhostChannelRequest>
 {
-    private readonly RemoraDiscordBotDbContext _dbContext;
     private readonly IMediator _mediator;
-    private readonly CacheService _cacheService;
 
     public MoveFromPossibleGhostChannelToPossibleGhostChannelRequestHandler(
-        RemoraDiscordBotDbContext dbContext,
-        IMediator mediator, 
-        CacheService cacheService)
+        IMediator mediator) 
     {
-        _dbContext = dbContext;
         _mediator = mediator;
-        _cacheService = cacheService;
     }
 
     protected override async Task Handle(
         MoveFromPossibleGhostChannelToPossibleGhostChannelRequest request,
         CancellationToken cancellationToken)
     {
-        var key = CacheKey.StringKey($"VoiceState:{request.ToGuildId}:{request.UserId}");
-
         switch (request.FromChannelId.HasValue)
         {
             case false:

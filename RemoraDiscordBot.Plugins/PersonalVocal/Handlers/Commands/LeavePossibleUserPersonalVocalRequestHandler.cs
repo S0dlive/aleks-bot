@@ -1,4 +1,4 @@
-// Copyright (c) Alexis Chân Gridel. All Rights Reserved.
+﻿// Copyright (c) Alexis Chân Gridel. All Rights Reserved.
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
@@ -43,11 +43,13 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
         LeavePossibleUserPersonalVocalRequest request,
         CancellationToken cancellationToken)
     {
-        var key = CacheKey.StringKey($"VoiceState:{request.GatewayEvent.GuildID}:{request.GatewayEvent.UserID}");
-        var cache = await _cacheService.TryGetValueAsync<IVoiceStateUpdate>(key, cancellationToken);
+        if (!request.FromChannelId.HasValue)
+        {
+            return;
+        }
         
         var personalVocal = await _dbContext.UserPersonalVocals.FirstOrDefaultAsync(
-            x => x.ChannelId == cache.Entity.ChannelID.Value.ToLong(),
+            x => x.ChannelId == request.FromChannelId.Value.ToLong(),
             cancellationToken);
         
         if (personalVocal is null)
@@ -55,12 +57,12 @@ public sealed class LeavePossibleUserPersonalVocalRequestHandler
             _logger.LogInformation(
                 "User {UserId} left channel {ChannelId} but no personal vocal channel found",
                 request.UserId,
-                cache.Entity.ChannelID.Value);
+                request.FromChannelId.Value);
             return;
         }
         
         var personalVocalChannel = await _channelApi.GetChannelAsync(
-            cache.Entity.ChannelID.Value,
+            request.FromChannelId.Value,
             ct: cancellationToken);
 
         if (!personalVocalChannel.IsSuccess)
