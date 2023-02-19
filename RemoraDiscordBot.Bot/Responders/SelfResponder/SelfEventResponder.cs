@@ -2,6 +2,7 @@
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
+using Remora.Discord.API.Abstractions.Rest;
 using Remora.Discord.API.Gateway.Events;
 using Remora.Discord.Commands.Feedback.Services;
 using Remora.Discord.Gateway.Responders;
@@ -14,10 +15,14 @@ public sealed class SelfEventResponder
     : IResponder<MessageCreate>
 {
     private readonly FeedbackService _feedbackService;
+    private readonly IDiscordRestUserAPI _discordRestUserApi;
 
-    public SelfEventResponder(FeedbackService feedbackService)
+    public SelfEventResponder(
+        FeedbackService feedbackService,
+        IDiscordRestUserAPI discordRestUserApi)
     {
         _feedbackService = feedbackService;
+        _discordRestUserApi = discordRestUserApi;
     }
 
     public async Task<Result> RespondAsync(
@@ -25,13 +30,14 @@ public sealed class SelfEventResponder
         CancellationToken ct = default)
     {
         var message = gatewayEvent.Content;
+        var botSnowflake = await _discordRestUserApi.GetCurrentUserAsync(ct);
 
         if (gatewayEvent.Author.IsBot is {Value: true, HasValue: true})
         {
             return Result.FromSuccess();
         }
 
-        if (message.Equals($"<@!{gatewayEvent.Author.ID}>"))
+        if (message.Equals($"<@!{botSnowflake.Entity.ID}>"))
         {
             return (Result) await _feedbackService.SendContentAsync
             (
