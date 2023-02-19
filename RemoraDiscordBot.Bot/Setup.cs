@@ -16,6 +16,7 @@ using RemoraDiscordBot.Core.CommandGroups;
 using RemoraDiscordBot.Core.Exceptions;
 using RemoraDiscordBot.Core.Infrastructure;
 using RemoraDiscordBot.Core.Responders.AnyResponderLogging;
+using RemoraDiscordBot.Core.Responders.SelfResponder;
 using RemoraDiscordBot.Plugins.Experience;
 using RemoraDiscordBot.Plugins.Welcomer;
 
@@ -52,6 +53,8 @@ public static class Setup
                 .AddAnyEventResponderLogging()
                 .AddDiscordBotInfrastructure()
                 .AddDiscordBotBusiness()
+            
+                .AddSelfResponder()
             ;
     }
 }
