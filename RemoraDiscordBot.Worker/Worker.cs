@@ -56,6 +56,8 @@ public class Worker
         };
 
         if (!updateSlash.IsSuccess)
-            _logger.LogWarning("Failed to update slash commands: {Reason}", updateSlash.Error.Message);
+        {
+            _logger.LogWarning(updateSlash.Inner?.Error?.Message);
+        }
     }
 }
