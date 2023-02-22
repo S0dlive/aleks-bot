@@ -43,6 +43,8 @@ public class Worker
                       ?? throw new ArgumentNullException("Discord:GUILD_ID_");
 
         var guildIdParsed = ulong.Parse(guildId);
+        
+        _logger.LogInformation("Guild ID: {GuildId}", guildIdParsed);
 
         var development = _configuration["DOTNET_ENVIRONMENT"] == "Development";
 
