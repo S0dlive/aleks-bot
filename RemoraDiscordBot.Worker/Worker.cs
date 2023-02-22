@@ -2,6 +2,7 @@
 // Licensed under the GNU General Public License v3.0.
 // See the LICENSE file in the project root for more information.
 
+using System.Text.Json;
 using Remora.Discord.Commands.Services;
 using Remora.Discord.Gateway;
 using Remora.Rest.Core;
@@ -57,7 +58,7 @@ public class Worker
 
         if (!updateSlash.IsSuccess)
         {
-            _logger.LogWarning(updateSlash.Inner?.Error?.Message);
+            _logger.LogWarning("Failed to update slash commands: {Error}", JsonSerializer.Serialize(updateSlash));
         }
     }
 }
