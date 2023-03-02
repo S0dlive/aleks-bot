@@ -1,7 +1,9 @@
-<div align="center">
+<h1 align="center">
+   <br/>
     <img src="Assets/axolotl.png" alt="Axolotl" width="200" height="200"/>
-    <h1>Aleks Bot</h1>
-</div>
+   </br/>
+    Aleks Bot
+</h1>
 <hr/>
 <h4 align="center">A professional discord bot for a professional discord server.</h4>
 <h5 align="center">Modulable, open-source, powerful, moderation, fun, socials, etc.</h5>
