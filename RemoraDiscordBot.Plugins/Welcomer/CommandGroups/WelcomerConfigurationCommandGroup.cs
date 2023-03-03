@@ -85,7 +85,7 @@ public class WelcomerConfigurationCommandGroup
     }
 
     [Command("setwelcomemessage")]
-    [Description("not implemented")]
+    [Description("Set a new welcome message.")]
     [Ephemeral]
     public async Task<IResult> UpdateWelcomeMessage([Description("new welcome message")] string newMessage)
     {

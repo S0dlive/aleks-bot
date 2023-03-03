@@ -5,7 +5,8 @@ using RemoraDiscordBot.Plugins.Welcomer.Commands;
 
 namespace RemoraDiscordBot.Plugins.Welcomer.Handlers.Commands;
 
-public class UpdateWelcomeMessageHandler : AsyncRequestHandler<UpdateWelcomeMessageCommand>
+public class UpdateWelcomeMessageHandler
+    : AsyncRequestHandler<UpdateWelcomeMessageCommand>
 {
     private readonly RemoraDiscordBotDbContext _dbContext;
 
@@ -13,11 +14,10 @@ public class UpdateWelcomeMessageHandler : AsyncRequestHandler<UpdateWelcomeMess
     {
         _dbContext = dbContext;
     }
-    
+
     protected override async Task Handle(UpdateWelcomeMessageCommand request, CancellationToken cancellationToken)
     {
-        var guild = await _dbContext.WelcomerGuilds.
-            FirstOrDefaultAsync(t => t.GuildId == request.GuildId);
+        var guild = await _dbContext.WelcomerGuilds.FirstOrDefaultAsync(t => t.GuildId == request.GuildId);
 
         if (guild != null)
         {
