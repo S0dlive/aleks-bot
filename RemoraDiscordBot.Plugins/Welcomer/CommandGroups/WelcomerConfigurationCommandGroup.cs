@@ -13,6 +13,7 @@ using Remora.Discord.Commands.Extensions;
 using Remora.Discord.Commands.Feedback.Messages;
 using Remora.Discord.Commands.Feedback.Services;
 using Remora.Results;
+using RemoraDiscordBot.Business.Extensions;
 using RemoraDiscordBot.Data;
 using RemoraDiscordBot.Plugins.Welcomer.Commands;
 using RemoraDiscordBot.Plugins.Welcomer.Queries;
@@ -78,6 +79,24 @@ public class WelcomerConfigurationCommandGroup
         return (Result) await _feedbackService.SendContextualSuccessAsync(
             "Welcomer disabled.",
             options: new FeedbackMessageOptions
+            {
+                MessageFlags = MessageFlags.Ephemeral
+            });
+    }
+
+    [Command("setwelcomemessage")]
+    [Description("not implemented")]
+    [Ephemeral]
+    public async Task<IResult> UpdateWelcomeMessage([Description("new welcome message")] string newMessage)
+    {
+        if (!_commandContext.TryGetGuildID(out var guildId))
+            throw new InvalidOperationException("Cannot get guild ID from interaction context.");
+
+        _mediator.Send(new UpdateWelcomeMessageCommand(guildId.Value.ToLong(),
+            newMessage));
+
+        return (Result) await _feedbackService.SendContextualSuccessAsync(
+            "new welcome message was upload in database.", options: new FeedbackMessageOptions()
             {
                 MessageFlags = MessageFlags.Ephemeral
             });
