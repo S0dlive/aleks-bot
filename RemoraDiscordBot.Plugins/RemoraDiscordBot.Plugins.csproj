@@ -25,6 +25,8 @@
       <Folder Include="AutoRoles\Handlers\Queries" />
       <Folder Include="AutoRoles\Queries" />
       <Folder Include="AutoRoles\Responders" />
+      <Folder Include="Ticket\Handlers\Queries" />
+      <Folder Include="Ticket\Queries" />
     </ItemGroup>
 
 </Project>

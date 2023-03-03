@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using RemoraDiscordBot.Data.Domain.AutoRoles;
 using RemoraDiscordBot.Data.Domain.Experience;
 using RemoraDiscordBot.Data.Domain.PersonalVocal;
+using RemoraDiscordBot.Data.Domain.Ticket;
 using RemoraDiscordBot.Data.Domain.Welcomer;
 
 namespace RemoraDiscordBot.Data;
@@ -24,7 +25,7 @@ public class RemoraDiscordBotDbContext
     public DbSet<WelcomerGuild> WelcomerGuilds { get; set; } = null!;
 
     public DbSet<UserGuildCreature> UserGuildCreatures { get; set; } = null!;
-
+    public DbSet<TicketDetails> Tickets { get; set; }
     public DbSet<AutoRoleChannel> AutoRoleChannels { get; set; } = null!;
     public DbSet<AutoRoleReaction> AutoRoleReactions { get; set; } = null!;
     public DbSet<PersonalVocal> PersonalVocals { get; set; } = null!;
